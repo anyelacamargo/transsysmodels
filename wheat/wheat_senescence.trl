@@ -1,0 +1,227 @@
+transsys wg
+{
+  factor branchlevel
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
+  factor chlorophyll
+  {
+    decay: 0.1 + senescence;
+    diffusibility: 0.0;
+  }
+
+  factor senescence
+  {
+    decay: 0.1;
+    diffusibility: 0.0;
+  }
+
+  factor globaltime
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
+  factor localtime
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
+  factor growphytomer
+  {
+    decay: 1.0;
+    diffusibility: 0.0;
+  }
+
+  factor growtiller
+  {
+    decay: 1.0;
+    diffusibility: 0.0;
+  }
+
+  factor internodelength
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
+  gene chlorophyll_gene
+  {
+    promoter
+    {
+      constitutive: 0.1;
+    }
+    product
+    {
+      default: chlorophyll;
+    }
+  }
+
+  gene senescence_gene
+  {
+    promoter
+    {
+      constitutive: 0.1;
+    }
+    product
+    {
+      default: senescence;
+    }
+  }
+
+  gene tillermaster
+  {
+    promoter
+    {
+      constitutive: (branchlevel < 1) && (globaltime > 3) && (globaltime < 6);
+    }
+    product
+    {
+      default: growtiller;
+    }
+  }
+
+  gene phytomermaster
+  {
+    promoter
+    {
+      constitutive: globaltime < 9;
+    }
+    product
+    {
+      default: growphytomer;
+    }
+  }
+
+  gene elongatemaster
+  {
+    promoter
+    {
+      constitutive: (globaltime > 5) && (globaltime < 14);
+    }
+    product
+    {
+      default: internodelength;
+    }
+  }
+
+  gene localticker
+  {
+    promoter
+    {
+      constitutive: 1.0;
+    }
+    product
+    {
+      default: localtime;
+    }
+  }
+
+  gene globalticker
+  {
+    promoter
+    {
+      constitutive: 1.0;
+    }
+    product
+    {
+      default: globaltime;
+    }
+  }
+}
+
+
+lsys wheat
+{
+  symbol seed(wg);
+  symbol meristem(wg);
+  symbol internode(wg);
+  symbol mesocotyl(wg);
+  symbol blade(wg);
+  symbol branch;
+  symbol r;
+  symbol grainshell;
+  symbol [;
+  symbol ];
+
+  axiom seed();
+
+  rule germinate
+  {
+    seed(t) -->
+    grainshell
+    mesocotyl(transsys t: )
+    [ blade(transsys t: ) ]
+    internode(transsys t: internodelength = 0.1)
+    meristem(transsys t: )
+  }
+
+  rule maketiller
+  {
+    meristem(t) : t.growtiller == 1 -->
+    [ branch meristem(transsys t: branchlevel = t.branchlevel + 1) ]
+    internode(transsys t: internodelength = 0.1)
+    r
+    meristem(transsys t: )
+  }
+
+  rule makephytomer
+  {
+    meristem(t) : (t.growphytomer == 1) && (t.growtiller == 0) -->
+    [ blade(transsys t: ) ]
+    internode(transsys t: internodelength = 0.1)
+    r
+    meristem(transsys t: )
+  }
+
+  graphics
+  {
+    seed
+    {
+      color(1.0, 1.0, 0.0);
+      sphere(0.4);
+    }
+    grainshell
+    {
+      color(0.8, 0.8, 0.2);
+      sphere(0.5);
+      move(0.5);
+    }
+    internode
+    {
+      move(internodelength * 0.5);
+      color(0.0, 1.0, 0.0);
+      cylinder(0.2, internodelength);
+      move(internodelength * 0.5);
+    }
+    mesocotyl
+    {
+      bank(-90);
+      move(0.5);
+      color(0.9, 0.9, 0.9);
+      cylinder(0.2, 1.0);
+      move(0.5);
+    }
+    blade
+    {
+      bank(40);
+      color(0.0, 1.0, 0.0);
+      move(1.0);
+      box(0.5, 0.05, 2.0);
+      move(1.0);
+    }
+    meristem
+    {
+      move(0.1);
+      color(1.0, 0.0, 0.0);
+      sphere(0.2);
+    }
+    branch { bank(20); }
+    r { roll(180); }
+    [ { push(); }
+    ] { pop(); }
+  }
+}
