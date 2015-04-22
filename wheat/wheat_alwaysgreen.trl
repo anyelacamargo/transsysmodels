@@ -8,13 +8,13 @@ transsys wg
 
   factor chlorophyll
   {
-    decay: 1.0;
+    decay: 0.1 + senescence;
     diffusibility: 0.0;
   }
 
   factor senescence
   {
-    decay: 1.0;
+    decay: 0.1;
     diffusibility: 0.0;
   }
 
@@ -52,7 +52,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: 1.0 * (senescence < 1.0);
+      constitutive: 0.1;
     }
     product
     {
@@ -64,7 +64,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: localtime > 3;
+      constitutive: 0.1;
     }
     product
     {
@@ -154,7 +154,7 @@ lsys wheat
     seed(t) -->
     grainshell
     mesocotyl(transsys t: )
-    [ blade(transsys t: localtime = 0.0) ]
+    [ blade(transsys t: ) ]
     internode(transsys t: internodelength = 0.1)
     meristem(transsys t: )
   }
@@ -171,7 +171,7 @@ lsys wheat
   rule makephytomer
   {
     meristem(t) : (t.growphytomer == 1) && (t.growtiller == 0) -->
-    [ blade(transsys t: localtime = 0.0) ]
+    [ blade(transsys t: ) ]
     internode(transsys t: internodelength = 0.1)
     r
     meristem(transsys t: )
@@ -208,7 +208,7 @@ lsys wheat
     blade
     {
       bank(40);
-      color(1.0 - chlorophyll, 1.0, 0.0);
+      color(0.0, 1.0, 0.0);
       move(1.0);
       box(0.5, 0.05, 2.0);
       move(1.0);

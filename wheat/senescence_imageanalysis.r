@@ -219,7 +219,6 @@ doodle2cdata <- function(doodleFile)
   {
     idx <- which(it$i == freq[i])
     hexlist <- append(hexlist, as.character(it[idx, 5]));
-    
   }
   g <- expand.grid(idtag = idtag, intensity = hexlist,time = time);
   cdata <- data.frame(g, value = vector_data);
@@ -227,11 +226,40 @@ doodle2cdata <- function(doodleFile)
 }
 
 
+readLsysCdata <- function(lsysBasename, colormapFname)
+{
+  fnamePattern <- sprintf("%s_d.\\.ppm", lsysBasename);
+  fnameList <- dir(pattern = fnamePattern);
+  lsysPfs <- readPixelFreqSeries(fnameList, colormapFname);
+  lsysCdata <- pfs2cdata(lsysPfs, 4);
+  ## FIXME: position of time step determined by crude positional hack
+  timestepStrPos <- nchar(lsysBasename) + 3;
+  lsysCdata$time <- as.factor(sprintf("t%s", substring(as.character(lsysCdata$time), timestepStrPos, timestepStrPos)));
+  return(lsysCdata);
+}
+
+
+showDistanceTable <- function(allData)
+{
+  for (wheatModelName in names(allData$lsysProfilesList))
+  {
+    message(sprintf("distance(empirical, %s) = %6.2f", wheatModelName, allProfileCorrelationDistance(allData$doodleProfiles, allData$lsysProfilesList[[wheatModelName]])));
+  }
+}
+
+
 doodleLsys <- function()
 {
-  lsysPfs <- readPixelFreqSeries(dir(pattern = "wheat_senescence_d.\\.ppm"), "rgb4colormap.pnm");
-  lsysCdata <- pfs2cdata(lsysPfs, 4);
-  lsysCdata$time <- as.factor(sprintf("t%s", substring(as.character(lsysCdata$time), 19, 19)));
+  wheatModelNameList <- c("singleshoot", "alwaysgreen", "senescence");
+  lsysCdataList <- list();
+  lsysProfilesList <- list();
+  for (wheatModelName in wheatModelNameList)
+  {
+    lsysCdata <- readLsysCdata(sprintf("wheat_%s", wheatModelName), "rgb4colormap.pnm");
+    lsysCdataList[[wheatModelName]] <- lsysCdata;
+    lsysProfiles <- allProfileList(lsysCdata, "dummyId");
+    lsysProfilesList[[wheatModelName]] <- lsysProfiles;
+  }
   doodleCdata <- doodle2cdata("doodle.txt");
   ## arbitrary selection of 7 time points, to match the 7 time points in the lsys data
   doodleTime <- c(" 2015-01-17", " 2015-01-23", " 2015-01-28", " 2015-02-03", " 2015-02-08", " 2015-03-05", " 2015-03-24");
@@ -240,8 +268,8 @@ doodleLsys <- function()
   doodleCdata <- doodleCdata[doodleCdata$time %in% names(doodleTimeMap), ];
   doodleCdata$time <- doodleTimeMap[as.character(doodleCdata$time)];
   doodleCdata$intensity <- as.character(doodleCdata$intensity);
-  lsysProfiles <- allProfileList(lsysCdata, "dummyId");
   doodleProfiles <- allProfileList(doodleCdata, "W8-114112");
-  allData <- list(lsysCdata = lsysCdata, doodleCdata = doodleCdata, lsysProfiles = lsysProfiles, doodleProfiles = doodleProfiles);
+  allData <- list(lsysCdataList = lsysCdataList, doodleCdata = doodleCdata, lsysProfilesList = lsysProfilesList, doodleProfiles = doodleProfiles);
+  showDistanceTable(allData);
   return(invisible(allData));
 }
