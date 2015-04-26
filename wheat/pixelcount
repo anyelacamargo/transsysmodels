@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+
+import sys
+import getopt
+
+
+class PpmPixel(object) :
+  
+  def __init__(self, r, g, b) :
+    self.r = r
+    self.g = g
+    self.b = b
+    
+    
+  def __str__(self) :
+    return 'rgb%x%x%x' % (self.r, self.g, self.b)
+  
+
+class PpmStream(object) :
+  
+  def __init__(self, f) :
+    self.v = []
+    self.f = f
+    
+
+  def nextLine(self) :
+    while len(self.v) == 0 :
+      l = self.f.readline()
+      if l == '' :
+        raise StandardError, 'premature EOF'
+      self.v = l.strip().split()
+        
+  def nextValue(self) :
+    if len(self.v) == 0 :
+      self.nextLine()
+    return self.v.pop(0)
+
+  
+  def nextInt(self) :
+    return int(self.nextValue())
+
+  
+  def nextPixel(self) :
+    r = self.nextInt()
+    g = self.nextInt()
+    b = self.nextInt()
+    return PpmPixel(r, g, b)
+    
+
+def makeColorFreqDict(f) :
+  s = PpmStream(f)
+  if s.nextValue() != 'P3' :
+    raise StandardError, 'input is not a ppm (use pnmnoraw?)'
+  width = s.nextInt()
+  height = s.nextInt()
+  maxIntensity = s.nextInt()
+  # if maxIntensity != 3 :
+  #   raise StandardError, 'can currently only deal with max. intensity of 3'
+  colorFreqDict = {}
+  for r in xrange(maxIntensity + 1) :
+    for g in xrange(maxIntensity + 1) :
+      for b in xrange(maxIntensity + 1) :
+        p = PpmPixel(r, g, b)
+        colorName = str(p)
+        colorFreqDict[colorName] = 0
+  for y in xrange(height) :
+    for x in xrange(width) :
+      p = s.nextPixel()
+      colorName = str(p)
+      colorFreqDict[colorName] = colorFreqDict[colorName] + 1
+  return colorFreqDict
+
+
+def pnmstats(infile, outfile) :
+  colorFreqDict = makeColorFreqDict(infile)
+  colorNameList = colorFreqDict.keys()
+  colorNameList.sort()
+  outfile.write('numPixels\n')
+  for colorName in colorNameList :
+    outfile.write('%s\t%s\n' % (colorName, colorFreqDict[colorName]))
+
+    
+options, args = getopt.getopt(sys.argv[1:], 'h')
+for opt, par in options :
+  if opt == '-h' :
+    print 'options:'
+    print '-h: print this help and exit'
+    sys.exit()
+  else :
+    raise StandardError, 'unhandled option "%s"' % opt
+if len(args) > 0 :
+  infile = open(args[0], 'r')
+else :
+  infile = sys.stdin
+if len(args) > 1 :
+  outfile = open(args[1], 'w')
+else :
+  outfile = sys.stdout
+pnmstats(infile, outfile)
