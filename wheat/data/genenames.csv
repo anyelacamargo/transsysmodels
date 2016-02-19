@@ -1,61 +1,157 @@
 Category_description_blasthit,TIGR_contig,Probe_name,clusterfigure,Mvalue_t8–t2,Mvalue_P(fdr),Leaf_zone_experiment,table
-Cathepsin_B_cys_protease,TC264944,G01_o232_plate_16,D3,1,0.001,Yes,tb1
-Cysteine_proteinase_1,TC235863,A04_a22_plate_12,D1,1.6,0.001,,tb1
-Oryzain_cys_protease,TC232331,B12_n129_plate_05,D3,2.8,0.001,Yes,tb1
-Thiol_protease_aleurain,TC248025,B03_p537_plate_03,D1,1.89,0.001,Yes,tb1
-Acyl_CoA_oxidase,TC267338,F08_l226_plate_08,D3,0.52,0.001,,tb1
-Digalactosyldiacylglycerol_synthase_1,TC262935,E09_p638_plate_02,D3,0.65,0.001,,tb1
-Pheophorbide aoxygenase,TC208996,TA-PaO_clone_39,D1,0.94,0.001,Yes,tb1
-Aspartate_aminotransferase_(cytoplasmic),TC233360,A01_e512_plate_02,D3,1.08,0.001,Yes,tb1
-Citrate_synthase_like,TC251394,E07_n130_plate_63,D3,0.73,0.001,Yes,tb1
-Cytoplasmic_aconitate_hydratase,TC247951,B04_p840_plate_10,D3,1.12,0.001,Yes,tb1
-Succinate_dehydrogenase,TC250769,C02_n129_plate_19,D2,0.67,0.001,Yes,tb1
-Subtilisin/chymotrypsin_inhibitor,AL829779,G04_p840_plate_07,D4,0.37,0.002,Yes,tb1
-Glutamine_synthetase_1,TC232180,GS1A_5–3-UTR,D2,0.91,0.002,,tb1
-Saccharopin_dehydrogenase_like,TC252360,A02_e411_plate_02,D4,0.9,0.002,Yes,tb1
-Cell_division_protein_ftsH,TC262794,C12_p133_plate_11,D1,1.09,0.003,Yes,tb1
-Protease_inhibitor_like,TC236737,B12_p638_plate_01,D1,0.49,0.003,Yes,tb1
-N_Acetylornithine_deacetylase_like,TC251522,C08_d26_plate_11,D2,0.83,0.003,Yes,tb1
-Acyl_CoA_dehydrogenase,TC237494,B01_p436_plate_08,D2,0.48,0.004,,tb1
-Ribonuclease_T2,TC237201,C04_p638_plate_02,D3,0.91,0.004,Yes,tb1
-Acetylornithine_aminotransferase_(mito.),TC252228,B12_o232_plate_01,D4,0.61,0.004,Yes,tb1
-Aminoacylase_1,TC239032,B11_p234_plate_26,D2,0.64,0.004,Yes,tb1
-Thylakoid_processing_peptidase_like,TC237926,B11_p234_plate_15,D3,0.47,0.005,,tb1
-Glutaryl_CoA_dehydrogenase,TC251147,D12_e29_plate_01,D3,0.62,0.005,Yes,tb1
-Lipase_like,TC247759,D10_p537_plate_06,D2,0.3,0.005,,tb1
-Pyruvate_orthophosphate_dikinase,TC263575,D01_j223_plate_13,D4,0.61,0.005,,tb1
-3_Ketoacyl_CoA_thiolase_like,TC232417,F03_n130_plate_64,D2,1.22,0.006,Yes,tb1
-Prephenate_dehydratase,TC252605,D08_p234_plate_23,D3,0.35,0.006,Yes,tb1
-Aminopeptidase_M,TC235063,D09_p537_plate_05,D4,0.55,0.007,,tb1
-Protease_inhibitor,TC252413,D10_e512_plate_09,D1,0.7,0.007,,tb1
-CoA_thioester_hydrolase,TC247446,B03_j223_plate_05,D2,0.36,0.007,,tb1
-Phospholipase_C,TC265103,E01_n130_plate_48,D1,0.94,0.007,Yes,tb1
-4_Hydroxyphenylpyruvate_dioxygenase,TC251015,E08_p234_plate_26,D3,0.72,0.007,Yes,tb1
-Lysophospholipase_like,TC235808,C08_p638_plate_10,D2,0.6,0.008,,tb1
-Pyrrolidone_carboxyl_peptidase_like,TC235096,H02_p840_plate_05,D3,0.38,0.011,,tb1
-Fatty_acid_oxidation_MFP_a,TC251539,B05_d26_plate_16,D4,0.49,0.011,Yes,tb1
-Glutamate_decarboxylase,TC247084,H07_p436_plate_10,D2,0.51,0.011,Yes,tb1
-Carboxyl_terminal_proteinase_like,TC247757,G10_l226_plate_08,D3,0.32,0.013,,tb1
-C13_endopeptidase_NP1,TC268075,F05_p638_plate_06,D3,0.67,0.014,,tb1
-Endopeptidase_inhibitor,TC232212,D08_p638_plate_09,D3,0.41,0.016,Yes,tb1
-Phytepsin_aspartic_protease,TC232293,D10_e411_plate_13,D3,0.84,0.019,Yes,tb1
-Dihydrolipoamide_dehydrogenase,TC234044,E03_e310_plate_06,D1,0.22,0.061,,tb1
-Phosphoenol_pyruvate_carboxylase,TC234828,C03_d15_plate_07,D4,0.46,0.075,Yes,tb1
-Phospholipase_D,TC271843,D08_p335_plate_03,C2,0.2,0.081,,tb1
-2_Oxoglutarate_dehydrogenase,TC265347,C02_n130_plate_20,D1,0.17,0.081,Yes,tb1
-NADP_dependent_malic_enzyme,TC248138,C10_j324_plate_11,B3,-0.51,0.001,,tb2
-Ribulose_15_bisphosphate_carboxylase,TC263777,G02_p638_plate_03,A2,-1.73,0.001,Yes,tb2
-ABA_responsive_protein,TC248639,C02_p335_plate_09,A2,-1.03,0.002,Yes,tb2
-Glutamine_synthase_2,TC247042,E02_e512_plate_10,A2,-1.3,0.002,Yes,tb2
-Auxin_responsive_protein_IAA11,TC250867,C11_n130_plate_01,B3,-0.22,0.004,,tb2
-Auxin_response_factor_2,TC271740,C09_j223_plate_08,B4,-0.32,0.005,Yes,tb2
-Fructose_16_bisphosphatase,TC235264,E04_e411_plate_11,A1,-0.82,0.005,Yes,tb2
-Sucrose_phosphate_synthase,TC253235,C10_p739_plate_04,A4,-0.91,0.005,Yes,tb2
-Auxin_induced_protein_iaa4,TC256918,B12_a22_plate_15,A1,-0.31,0.007,,tb2
-Jasmonate_induced_protein,TC254334,F12_O232_plate_12,A4,-0.38,0.008,Yes,tb2
-Pyruvate_dehydrogenase,TC232553,A08_a22_plate_15,B2,-0.5,0.012,,tb2
-Phosphoglucomutase,TC263574,D07_e310_plate_07,A3,-0.44,0.012,Yes,tb2
-Aspartate_aminotransferase_mitochondrial,TC266378,C05_n129_plate_09,B3,-0.2,0.019,,tb2
-Hydroxyphenylpyruvate_reductase,TC265421,E06_d15_plate_11,A2,-0.45,0.023,Yes,tb2
-Hydroxypyruvate_reductase,TC264603,E02_d15_plate_11,B2,-0.51,0.051,Yes,tb2
-Aspartate_aminotransferase_plastidic,TC251580,A09_p638_plate_12,A2,-0.32,0.083,,tb2
+ Aspartate_aminotransferase_(cytoplasmic),TC233360,A01_e512_plate_02,D3,1.08,0.001,Yes,tb1
+  Saccharopin_dehydrogenase_like,TC252360,A02_e411_plate_02,D4,0.9,0.002,Yes,tb1
+  UDP_d_glucuronate_decarboxylase,TC233796,A03_p234_plate_22,D2,0.72,0.012,Yes,tb1
+  Cytochrome_P450_71C4_(BX2),TC255068,A03_p739_plate_05,D3,1.91,0.004,Yes,tb1
+  Cysteine_proteinase_1,TC235863,A04_a22_plate_12,D1,1.6,0.001,,tb1
+  Phosphatidylinositol_3__and_4_kinase_like,TC235016,A07_p133_plate_13,D2,0.39,0.01,,tb1
+  Glutathione_transferase,TC265396,A07_p335_plate_07,C1,0.48,0.085,,tb1
+  Pyruvate_dehydrogenase,TC232553,A08_a22_plate_15,B2,-0.5,0.012,,tb2
+  Galactinol_synthase_3,TC236799,A08_j324_plate_01,D2,0.21,0.016,,tb1
+  Heat_shock_protein_DnaJ_like,TC263235,A08_p638_plate_04,D2,0.72,0.027,,tb1
+  Flavonoid_7_O_methyltransferase_like,TC235924,A09_p234_plate_24,D4,0.52,0.001,Yes,tb1
+  Aspartate_aminotransferase_plastidic,TC251580,A09_p638_plate_12,A2,-0.32,0.083,,tb2
+  BAX_inhibitor_1,TC246789,A09_p739_plate_09,D2,0.46,0.012,Yes,tb1
+  Metallothionein_like_(MT_1),TC233324,A11_a11_plate_03,D2,1.36,0.004,Yes,tb1
+  ATPase_3,TC235454,A11_p335_plate_07,D3,0.41,0.032,Yes,tb1
+  Peptide_transporter,TC232669,A12_a22_plate_12,D4,0.41,0.041,Yes,tb1
+  Histidine_amino_acid_transporter,TC248195,A12_p436_plate_07,D3,1.43,0.005,Yes,tb1
+  Osmotin_like,TC269094,B01_n129_plate_19,D3,0.32,0.004,,tb1
+  Cytochrome_P450_78A1,TC256899,B01_p234_plate_18,D2,0.94,0.011,,tb1
+  Acyl_CoA_dehydrogenase,TC237494,B01_p436_plate_08,D2,0.48,0.004,,tb1
+  B_Galactosidase,TC248277,B02_p638_plate_05,D1,0.13,0.06,,tb1
+  Purple_acid_phosphatase_1,TC234184,B03_h116_plate_02,D3,0.66,0.002,Yes,tb1
+  CoA_thioester_hydrolase,TC247446,B03_j223_plate_05,D2,0.36,0.007,,tb1
+  Sorbitol_transporter,TC267356,B03_p234_plate_11,D3,1.31,0.001,Yes,tb1
+  Thiol_protease_aleurain,TC248025,B03_p537_plate_03,D1,1.89,0.001,Yes,tb1
+  Galactokinase,TC266216,B04_l226_plate_11,D4,0.29,0.011,,tb1
+  Cytoplasmic_aconitate_hydratase,TC247951,B04_p840_plate_10,D3,1.12,0.001,Yes,tb1
+  Fatty_acid_B_oxidation_MFP_a,TC251539,B05_d26_plate_16,D4,0.49,0.011,Yes,tb1
+  Amino_acid_ABC_transporter_permease,AL821810,B07_n130_plate_20,D1,0.33,0.024,,tb1
+  Cytochrome_P450_71C1_(BX4),TC238811,B07_n130_plate_38,D3,0.97,0.008,Yes,tb1
+  B_13_Glucanase,TC255698,B09_p436_plate_16,D2,0.59,0.008,Yes,tb1
+  1_Aminocyclopropane_1_carboxylate_oxidase,TC234937,B10_p133_plate_11,D3,0.44,0.007,,tb1
+  Rieske_iron_sulphur_protein_Tic55,TC253368,B10_p234_plate_22,D4,0.33,0.052,Yes,tb1
+  Metallothionein_type_2,TC248228,B10_p234_plate_26,D1,1.47,0.001,,tb1
+  NAC_domain_transcription_factor_(OsNAC6),TC262826,B11_n129_plate_09,D3,0.77,0.001,Yes,tb1
+  Thylakoid_processing_peptidase_like,TC237926,B11_p234_plate_15,D3,0.47,0.005,,tb1
+  Aminoacylase_1,TC239032,B11_p234_plate_26,D2,0.64,0.004,Yes,tb1
+  Vacuolar__ATPase_F,TC264203,B11_p739_plate_01,D2,0.54,0.013,Yes,tb1
+  Auxin_induced_protein_iaa4,TC256918,B12_a22_plate_15,A1,-0.31,0.007,,tb2
+  Oryzain_cys_protease,TC232331,B12_n129_plate_05,D3,2.8,0.001,Yes,tb1
+  Acetylornithine_aminotransferase_(mito.),TC252228,B12_o232_plate_01,D4,0.61,0.004,Yes,tb1
+  Protease_inhibitor_like,TC236737,B12_p638_plate_01,D1,0.49,0.003,Yes,tb1
+B_Xylosidase_like,TC235028,C01_o232_plate_06,D2,0.39,0.008,,tb1
+  20S_proteasome_ß5_subunit,TC234707,C01_p133_plate_12,D1,0.17,0.08,,tb1
+  Plasma_membrane_ATPase,TC246826,C01_p537_plate_01,D4,1.78,0.008,,tb1
+  Succinate_dehydrogenase,TC250769,C02_n129_plate_19,D2,0.67,0.001,Yes,tb1
+  2_Oxoglutarate_dehydrogenase,TC265347,C02_n130_plate_20,D1,0.17,0.081,Yes,tb1
+  WRKY_transcription_factor_(WRKY45),TC238177,C02_p133_plate_14,D4,0.53,0.022,,tb1
+  ABA_responsive_protein,TC248639,C02_p335_plate_09,A2,-1.03,0.002,Yes,tb2
+  NAC_domain_transcription_factor_(OsNAC3),TC266914,C02_p335_plate_07,D2,0.51,0.006,,tb1
+  Phosphoenol_pyruvate_carboxylase,TC234828,C03_d15_plate_07,D4,0.46,0.075,Yes,tb1
+  Leucine_rich_repeat_like_protein,TC265940,C03_e310_plate_02,D4,0.52,0.007,,tb1
+  GRAS_transcription_factor_(scarecrow),TC257071,C03_p234_plate_24,D2,0.35,0.009,,tb1
+  Ribonuclease_T2,TC237201,C04_p638_plate_02,D3,0.91,0.004,Yes,tb1
+  Autophagocytosis_protein_AUT1_like,TC249622,C04_p840_plate_04,D3,0.63,0.013,Yes,tb1
+  S_Adenosylmethionine_decarboxylase,TC233533,C05_l226_plate_03,D1,0.97,0.05,Yes,tb1
+  Aspartate_aminotransferase_mitochondrial,TC266378,C05_n129_plate_09,B3,-0.2,0.019,,tb2
+  Cytochrome_P450_72A5,TC251633,C06_p234_plate_26,D1,1.34,0.001,Yes,tb1
+  N_Acetylornithine_deacetylase_like,TC251522,C08_d26_plate_11,D2,0.83,0.003,Yes,tb1
+  Amino_acid_permease_6,TC240235,C08_p537_plate_01,D4,0.25,0.03,,tb1
+  Lysophospholipase_like,TC235808,C08_p638_plate_10,D2,0.6,0.008,,tb1
+  Auxin_response_factor_2,TC271740,C09_j223_plate_08,B4,-0.32,0.005,Yes,tb2
+  NADP_dependent_malic_enzyme,TC248138,C10_j324_plate_11,B3,-0.51,0.001,,tb2
+  Autophagy,TC234779,C10_p133_plate_08,D3,1,0.002,Yes,tb1
+  Ethylene_responsive_small_   GTP_binding_protein,TC233231,C10_p436_plate_20,D4,0.53,0.003,Yes,tb1
+  Sucrose_phosphate_synthase,TC253235,C10_p739_plate_04,A4,-0.91,0.005,Yes,tb2
+  Auxin_responsive_protein_IAA11,TC250867,C11_n130_plate_01,B3,-0.22,0.004,,tb2
+  2_Oxoglutarate_dependent_oxygenase_(BX6),TC251312,C12_n130_plate_32,D3,0.44,0.006,Yes,tb1
+  Cell_division_protein_ftsH,TC262794,C12_p133_plate_11,D1,1.09,0.003,Yes,tb1
+  Pyruvate_orthophosphate_dikinase,TC263575,D01_j223_plate_13,D4,0.61,0.005,,tb1
+  ABC_transporter_MRP_like,AL818333,D02_j223_plate_15,D2,0.35,0.004,,tb1
+  Chitinase,CV771073,D03_a11_plate_06,D4,0.28,0.051,Yes,tb1
+  Extracellular_invertase,TC265327,D03_p335_plate_08,D4,0.54,0.008,,tb1
+  Cytosolic_glutathione_peroxidase,TC246747,D05_p133_plate_02,D2,1.09,0.007,,tb1
+  Aldehyde_dehydrogenase_(cytosol),TC268892,D06_p335_plate_03,D1,0.19,0.042,Yes,tb1
+  Phosphoglucomutase,TC263574,D07_e310_plate_07,A3,-0.44,0.012,Yes,tb2
+  NAC_domain_transcription_factor_(GRAB2),TC266433,D07_p133_plate_04,D4,0.43,0.001,Yes,tb1
+  Early_drought_induced_protein,TC232841,D08_n129_plate_09,D3,0.75,0.035,Yes,tb1
+  Prephenate_dehydratase,TC252605,D08_p234_plate_23,D3,0.35,0.006,Yes,tb1
+  Phospholipase_D,TC271843,D08_p335_plate_03,C2,0.2,0.081,,tb1
+  Endopeptidase_inhibitor,TC232212,D08_p638_plate_09,D3,0.41,0.016,Yes,tb1
+  Myb_transcription_factor,TC248049,D09_p335_plate_07,D1,1.17,0.003,,tb1
+  Aminopeptidase_M,TC235063,D09_p537_plate_05,D4,0.55,0.007,,tb1
+  WRKY_transcription_factor_(WRKY6),TC237283,D09_p638_plate_11,D3,0.56,0.029,Yes,tb1
+  Phytepsin_aspartic_protease,TC232293,D10_e411_plate_13,D3,0.84,0.019,Yes,tb1
+  Protease_inhibitor,TC252413,D10_e512_plate_09,D1,0.7,0.007,,tb1
+  Lipase_like,TC247759,D10_p537_plate_06,D2,0.3,0.005,,tb1
+  Glutaryl_CoA_dehydrogenase,TC251147,D12_e29_plate_01,D3,0.62,0.005,Yes,tb1
+  Phospholipase_C,TC265103,E01_n130_plate_48,D1,0.94,0.007,Yes,tb1
+  Cellulose_synthase_like,TC253821,E01_p840_plate_03,D1,2.12,0.003,,tb1
+  Hydroxypyruvate_reductase,TC264603,E02_d15_plate_11,B2,-0.51,0.051,Yes,tb2
+  Glutamine_synthase_2,TC247042,E02_e512_plate_10,A2,-1.3,0.002,Yes,tb2
+  Dihydrolipoamide_dehydrogenase,TC234044,E03_e310_plate_06,D1,0.22,0.061,,tb1
+  Fructose_16_bisphosphatase,TC235264,E04_e411_plate_11,A1,-0.82,0.005,Yes,tb2
+  Ras_related_protein_Rab7,TC250513,E05_p335_plate_02,D4,0.38,0.009,,tb1
+  Hydroxyphenylpyruvate_reductase,TC265421,E06_d15_plate_11,A2,-0.45,0.023,Yes,tb2
+  Universal_stress_protein,TC266967,E06_p335_plate_06,D3,0.86,0.001,Yes,tb1
+  Citrate_synthase_like,TC251394,E07_n130_plate_63,D3,0.73,0.001,Yes,tb1
+  4_Hydroxyphenylpyruvate_dioxygenase,TC251015,E08_p234_plate_26,D3,0.72,0.007,Yes,tb1
+  Sucrose_synthase_1,TC232520,E09_e411_plate_05,D4,0.5,0.047,Yes,tb1
+  Catalase_isozyme_1,TC246912,E09_e411_plate_08,D3,0.66,0.005,Yes,tb1
+  UDP_glucose_4_epimerase,TC265238,E09_p133_plate_10,D4,0.74,0.026,Yes,tb1
+  B_d_Glucan_exohydrolase,TC262941,E09_p234_plate_03,D4,0.66,0.001,,tb1
+  Glutathione_S_transferase_19E50,TC234681,E09_p335_plate_03,D2,0.68,0.01,Yes,tb1
+  Digalactosyldiacylglycerol_synthase_1,TC262935,E09_p638_plate_02,D3,0.65,0.001,,tb1
+  Ubiquitin_conjugating_enzyme_E2,TC232162,E12_e512_plate_01,D4,0.28,0.015,Yes,tb1
+  3_Ketoacyl_CoA_thiolase_like,TC232417,F03_n130_plate_64,D2,1.22,0.006,Yes,tb1
+  B_Carotene_hydroxylase,TC256792,F03_p335_plate_05,D1,0.56,0.011,Yes,tb1
+  Kelch_repeat_F_box_protein,TC236037,F05_n130_plate_45,D3,0.96,0.001,Yes,tb1
+  C13_endopeptidase_NP1,TC268075,F05_p638_plate_06,D3,0.67,0.014,,tb1
+  Ras_related_protein_Rab_2_B,TC250710,F06_n129_plate_10,D3,0.41,0.002,Yes,tb1
+  Vacuolar_HPlusATPase_subunit_c,TC249227,F07_p436_plate_07,D3,0.54,0.012,,tb1
+  Acyl_CoA_oxidase,TC267338,F08_l226_plate_08,D3,0.52,0.001,,tb1
+  Ammonium_transporter_Amt1_2,TC268958,F08_p335_plate_01,D1,0.39,0.014,,tb1
+  Dehydrin,TC263011,F09_p234_plate_17,D2,1.71,0.002,Yes,tb1
+  Alkaline_a_galactosidase_I,TC255171,F10_n129_plate_16,D2,0.26,0.017,Yes,tb1
+  Jasmonate_induced_protein,TC254334,F12_O232_plate_12,A4,-0.38,0.008,Yes,tb2
+  Senescence_associated_protein_DH,TC232462,F12_p436_plate_07,D3,1.32,0.012,Yes,tb1
+  NADH_ubiquinone_oxidoreductase,TC233670,F12_p840_plate_06,D4,0.28,0.009,Yes,tb1
+  Cathepsin_B_cys_protease,TC264944,G01_o232_plate_16,D3,1,0.001,Yes,tb1
+  Alternative_oxidase_AOX3,TC267600,G01_p234_plate_12,D2,0.84,0.001,Yes,tb1
+  Remorin,TC247392,G01_p234_plate_06,D1,0.49,0.013,,tb1
+  Ribulose_15_bisphosphate_carboxylase,TC263777,G02_p638_plate_03,A2,-1.73,0.001,Yes,tb2
+  Hexose_transporter,TC263835,G03_h116_plate_04,C4,0.27,0.06,Yes,tb1
+  AP2_transcription_factor_(APETALA2B),TC252254,G03_j324_plate_11,C3,0.21,0.085,,tb1
+  Glucosyltransferase,TC260076,G03_p234_plate_13,D4,0.23,0.02,,tb1
+  Transport_inhibitor_response_(TIR1),TC236688,G03_p739_plate_05,D2,0.55,0.001,Yes,tb1
+  Importin_B2,TC269999,G04_e310_plate_05,D3,0.23,0.021,,tb1
+  Serine_threonine_protein_kinase,TC266459,G04_j223_plate_04,D4,0.19,0.09,,tb1
+  Protein_phosphatase_2A_A,TC234547,G04_n130_plate_39,C3,0.19,0.046,Yes,tb1
+  Ring_zinc_finger_protein_like,TC236539,G04_p638_plate_07,D4,0.37,0.006,Yes,tb1
+  Subtilisin_chymotrypsin_inhibitor,AL829779,G04_p840_plate_07,D4,0.37,0.002,Yes,tb1
+  Early_drought_induced_protein,TC232273,G05_o232_plate_02,D3,0.66,0.001,Yes,tb1
+  Cold_acclimation_protein_WCOR410c,TC250687,G05_p234_plate_12,D1,1.18,0.006,Yes,tb1
+  Glutaredoxin,TC235786,G08_p234_plate_13,D3,1.01,0.002,Yes,tb1
+  Glutathione S_transferase_GST_24,AL827614,G09_p638_plate_12,D3,1.83,0.003,,tb1
+  Carboxyl_terminal_proteinase_like,TC247757,G10_l226_plate_08,D3,0.32,0.013,,tb1
+  Glutathione S_transferase_1_GST_phi,TC248404,G12_p739_plate_01,D1,0.3,0.054,,tb1
+  Glutamine_synthetase_1,TC232180,GS1A_5_3_UTR,D2,0.91,0.002,,tb1
+  Hypersensitive_induced_reaction_prot_1,TC264093,H01_p436_plate_12,D2,1.59,0.004,Yes,tb1
+  Glutathione S_transferase,TC248700,H02_a11_plate_03,D3,0.74,0.006,,tb1
+  Transcription_factor_IIA_(TFIIA_L1),TC238703,H02_n129_plate_12,D2,0.21,0.013,,tb1
+  Pyrrolidone_carboxyl_peptidase_like,TC235096,H02_p840_plate_05,D3,0.38,0.011,,tb1
+  Cytochrome_P450_72A1,TC268980,H03_h116_plate_03,D4,0.31,0.005,Yes,tb1
+  Ammonium_transporter,TC268598,H04_p234_plate_14,C1,0.47,0.023,,tb1
+  Pyrophosphate_fructose_6_phosphate_   1_phosphotransferase,TC269100,H06_p133_plate_01,D4,0.48,0.007,,tb1
+  Heat_shock_protein_70,TC264186,H06_p234_plate_17,D1,1.47,0.008,Yes,tb1
+  a_Amylase,TC237239,H07_n130_plate_32,D2,0.84,0.002,Yes,tb1
+  Glutamate_decarboxylase,TC247084,H07_p436_plate_10,D2,0.51,0.011,Yes,tb1
+  Senescence_associated_protein_like,TC266001,H08_n129_plate_20,D4,0.2,0.022,Yes,tb1
+  Ubiquitin_like_protein_5,TC234513,H08_n130_plate_56,D3,0.89,0.001,Yes,tb1
+  Ferredoxin,TC237624,H08_p234_plate_14,D4,0.41,0.015,Yes,tb1
+  UDP_glucosyltransferase_(BX9),TC235289,H08_p234_plate_19,D2,0.35,0.01,,tb1
+  Leucine_rich_repeat_protein,TC248068,H08_p234_plate_21,D4,0.73,0.018,Yes,tb1
+  Senescence_associated_(HvS40_barley),TC196682,TA-HvS40_ clone_36,D4,0.15,0.041,Yes,tb1
+  Pheophorbide_aoxygenase,TC208996,TA_PaO_clone_39,D1,0.94,0.001,Yes,tb1
