@@ -1,0 +1,7 @@
+SpotType	Name	ID
+Gene	*	*
+Empty spots	empt*	*
+No spots	*	empt*
+ControlsI	PBS*	*
+ControlsII	pHUM*	*
+ControlsIII	pTRA*	*
