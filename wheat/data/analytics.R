@@ -2,7 +2,7 @@ library('affy')   # Affymetrix pre-processing
 library('limma') 
 #library(som);
 
-
+# dEMO
 MeanPerCol = function(timepoint_list, data)
 {
   copydata = data;
