@@ -1,26 +1,38 @@
 transsys senescence
 {
-# auxin initiates whole senescence. Detect apical meristem growth. That might be a signal that the plant has reaches a state
-   factor Auxin_response_factor_2
+
+# NAC family
+   factor NAC_domain_transcription_factor_OsNAC6
+   {
+     decay: 0.1;
+     diffusibility: 0.05;
+   }
+
+#WRK
+   factor WRKY_transcription_factor_WRKY45
+   {
+     decay: 0.1;
+     diffusibility: 0.05;
+   }
+
+# Protein degradation
+
+   factor Pyruvate_orthophosphate_dikinase
+
    {
      decay: 0.1;
      diffusibility: 0.05;
    }
  
-   gene Auxin_response_factor_2_gene
+# Chlorophyl degradation
+  factor Pheophorbide_aoxygenase
    {
-     promoter
-     {
-       constitutive: 0.2;
-     }
-     product
-     {
-       default: Auxin_response_factor_2;
-     }
+     decay: 0.1;
+     diffusibility: 0.05;
    }
 
-# NAC family
-   factor NAC_domain_transcription_factor_GRAB2
+# Lipid
+  factor Lipase_like
    {
      decay: 0.1;
      diffusibility: 0.05;
@@ -37,31 +49,7 @@ transsys senescence
        default: NAC_domain_transcription_factor_GRAB2;
      }
    }
-# NAC family
-   factor NAC_domain_transcription_factor_OsNAC6
-   {
-     decay: 0.1;
-     diffusibility: 0.05;
-   }
  
-   gene NAC_domain_transcription_factor_OsNAC6_gene
-   {
-     promoter
-     {
-       constitutive: 0.2;
-     }
-     product
-     {
-       default: NAC_domain_transcription_factor_OsNAC6;
-     }
-   }
-
-#WRK
-   factor WRKY_transcription_factor_WRKY45
-   {
-     decay: 0.1;
-     diffusibility: 0.05;
-   }
  
    gene WRKY_transcription_factor_WRKY45_gene
    {
@@ -75,81 +63,26 @@ transsys senescence
      }
    }
 
-# Myb protein
-   factor Myb_transcription_factor
-   {
-     decay: 0.1;
-     diffusibility: 0.05;
-   }
- 
-   gene Myb_transcription_factor_gene
+   gene Pyruvate_orthophosphate_dikinase_gene
    {
      promoter
      {
-       constitutive: 0.2;
-     }
-     product
-     {
-       default: Myb_transcription_factor;
-     }
-   }
-
-
-# Jasmonate hormone activated 
+       	constitutive: 0.2;
 	
-   factor Jasmonate_induced_protein
-   {
-     decay: 0.1;
-     diffusibility: 0.05;
-   }
- 
-   gene Jasmonate_induced_protein_gene
-   {
-     promoter
-     {
-       	constitutive: 0.2;
      }
      product
      {
-       default: Jasmonate_induced_protein;
+       default: Pyruvate_orthophosphate_dikinase;
      }
    }
 
-# Protein degradation
-
-   factor Ribonuclease_T2
-   {
-     decay: 0.1;
-     diffusibility: 0.05;
-   }
- 
-   gene Ribonuclease_T2_gene
-   {
-     promoter
-     {
-       	constitutive: 0.2;
-	Myb_transcription_factor: activate(0.01, 1.0);
-     }
-     product
-     {
-       default: Ribonuclease_T2;
-     }
-   }
-
-# Chlorophyl degradation
-   factor Pheophorbide_aoxygenase
-   {
-     decay: 0.1;
-     diffusibility: 0.05;
-   }
- 
    gene Pheophorbide_aoxygenase_gene
    {
      promoter
      {
        	constitutive: 0.2;
-	Myb_transcription_factor: activate(0.01, 1.0);
-	Ribonuclease_T2: activate(0.01, 1.0);
+	NAC_domain_transcription_factor_GRAB2: activate(0.01, 1.0);
+	WRKY_transcription_factor_WRKY45: activate(0.01, 1.0);
      }
      product
      {
@@ -157,45 +90,17 @@ transsys senescence
      }
    }
 
-# Transport 
-   factor Plasma_membrana_ATPase
-   {
-     decay: 0.1;
-     diffusibility: 0.05;
-   }
- 
-   gene Plasma_membrane_ATPase_gene
+   gene Lipase_like_gene
    {
      promoter
      {
        	constitutive: 0.2;
-	
+	Pheophorbide_aoxygenase: activate(0.01, 1.0);
      }
      product
      {
-       default: Plasma_membrana_ATPase;
+       default: Lipase_like;
      }
    }
 
-# Carbohydrate metabolims Ribulose_15_bisphosphate_carboxylase
-
-   factor Ribulose_15_bisphosphate_carboxylase
-   {
-     decay: 0.1;
-     diffusibility: 0.05;
-   }
- 
-   gene Ribulose_15_bisphosphate_carboxylase_gene
-   {
-     promoter
-     {
-       	constitutive: 0.2;
-	
-     }
-     product
-     {
-       default: Ribulose_15_bisphosphate_carboxylase;
-     }
-   }
-
- }
+}
