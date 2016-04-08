@@ -70,7 +70,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: 100.0;
+      constitutive: 10.0 + senescence * 90;
     }
     product
     {
@@ -82,7 +82,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: localtime > 3;
+      constitutive: localtime > 100;
     }
     product
     {
