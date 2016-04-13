@@ -1,11 +1,5 @@
 transsys wg
 {
-  factor branchlevel
-  {
-    decay: 0.0;
-    diffusibility: 0.0;
-  }
-
   factor pheophorbide_oxygenase
   {
     decay: 0.5;
@@ -36,9 +30,22 @@ transsys wg
     diffusibility: 0.0;
   }
 
-  factor growphytomer
+  factor branchlevel
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
+  factor vegetative
   {
     decay: 1.0;
+    diffusibility: 0.0;
+  }
+    
+
+  factor growphytomer
+  {
+    decay: 0.0;
     diffusibility: 0.0;
   }
 
@@ -90,6 +97,19 @@ transsys wg
     }
   }
 
+
+  gene vegetativemaster
+  {
+    promoter
+    {
+      constitutive: globaltime < 30;
+    }
+    product
+    {
+      default: vegetative;
+    }
+  }
+
   gene tillermaster
   {
     promoter
@@ -106,7 +126,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: globaltime < 9;
+      constitutive: 0.2; # globaltime < 9;
     }
     product
     {
@@ -118,7 +138,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: (globaltime > 5) && (globaltime < 14);
+      constitutive: (vegetative == 0.0) * (4.0 - internodelength) * 0.1;
     }
     product
     {
@@ -152,6 +172,7 @@ transsys wg
 }
 
 
+# http://www.usask.ca/agriculture/plantsci/winter_cereals/winter-wheat-production-manual/chapter-10.php
 lsys wheat
 {
   symbol seed(wg);
@@ -171,28 +192,20 @@ lsys wheat
   {
     seed(t) -->
     grainshell
-    mesocotyl(transsys t: )
-    [ blade(transsys t: localtime = 0.0) ]
-    internode(transsys t: internodelength = 0.1)
-    meristem(transsys t: )
-  }
-
-  rule maketiller
-  {
-    meristem(t) : t.growtiller == 1 -->
-    [ branch meristem(transsys t: branchlevel = t.branchlevel + 1) ]
-    internode(transsys t: internodelength = 0.1)
-    r
-    meristem(transsys t: )
+    mesocotyl(transsys t: growphytomer = 0.0)
+    [ blade(transsys t: localtime = 0.0, growphytomer = 0.0) ]
+    internode(transsys t: internodelength = 0.1, growphytomer = 0.0)
+    meristem(transsys t: growphytomer = 0.0)
   }
 
   rule makephytomer
   {
-    meristem(t) : (t.growphytomer == 1) && (t.growtiller == 0) -->
-    [ blade(transsys t: localtime = 0.0) ]
-    internode(transsys t: internodelength = 0.1)
+    # tillering not modelled currently
+    meristem(t) : (t.growphytomer >= 1) && (t.vegetative == 1.0)-->
+    [ blade(transsys t: localtime = 0.0, growphytomer = 0.0) ]
+    internode(transsys t: localtime = 0.0, growphytomer = 0.0, internodelength = 0.01)
     r
-    meristem(transsys t: )
+    meristem(transsys t: growphytomer = 0.0)
   }
 
   graphics
@@ -204,7 +217,7 @@ lsys wheat
     }
     grainshell
     {
-      color(0.8, 0.8, 0.2);
+      color(0.5, 0.3, 0.1);
       sphere(0.5);
       move(0.5);
     }
@@ -226,9 +239,9 @@ lsys wheat
     blade
     {
       bank(40);
-      color(1.0 - chlorophyll, 0.0, 0.0);
-      move(1.0);
-      box(0.5, 0.05, 2.0);
+      color(1.0 - chlorophyll * 2, 1.0, 0.0);
+      move(2.0);
+      box(0.5, 0.05, 4.0);
       move(1.0);
     }
     meristem
