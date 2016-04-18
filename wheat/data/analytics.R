@@ -111,7 +111,7 @@ normaliseData = function(data)
 }
 
 
-getDesignMatrix = function(timepoint)
+getTargets = function(metadata)
 {
   
   design = list()
@@ -145,8 +145,8 @@ createLM = function(names, probes, spottypes, metadata)
 {
   RG = readData(names, probes, spottypes);
   MA = normaliseData(RG);
-  m = getDesignMatrix(metadata);
-  design = modelMatrix(m,ref="-5")
+  targets = getTargets(metadata);
+  design = modelMatrix(targets, ref="-5")
   f = fitModel(MA, design);
   return(f);
   
@@ -171,7 +171,8 @@ for(probeNameProfile in candidategenes)
 {
   i = which(fit$genes$Name == probeNameProfile);
   j = which(genetable$Probe_name == probeNameProfile);
-  plotProfile(fit$t[i,], probeNameProfile, genetable$Category_description_blasthit[j], 'timepoint', 'intensity (log10)');
+  plotProfile(fit$t[i,], probeNameProfile, genetable$Category_description_blasthit[j], 
+              'timepoint', 'intensity (log10)');
   if(readline(probeNameProfile) == 'q' ) { break();}
   
 }
