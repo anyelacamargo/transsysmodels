@@ -1,3 +1,4 @@
+rm(list=ls())
 library('affy')   # Affymetrix pre-processing
 library('limma') 
 #library(som);
@@ -105,13 +106,12 @@ normaliseData = function(data)
 {
   RG = data;
   MA <- normalizeWithinArrays(RG);
-  #MA <- normalizeBetweenArrays(MA, method="Aquantile");
   return(MA);
   
 }
 
 
-getDesignMatrix = function(timepoint, repl)
+getDesignMatrix = function(timepoint)
 {
   
   design = list()
@@ -155,19 +155,13 @@ createLM = function(names, probes, spottypes, metadata)
 
 
 unzip('E-MEXP-850.raw.1.zip');
-genetable = read.table('genenames.csv', sep=',', header=T);
-names=c("array01.txt","array02.txt","array03.txt","array04.txt","array05.txt",
-        "array06.txt", "array07.txt","array08.txt","array09.txt","array10.txt",
-        "array11.txt","array12.txt","array13.txt","array14.txt", "array15.txt", 
-        "array16.txt");
-
-metadata = read.table('E-MEXP-850.sdrf.txt', header=TRUE, sep='\t');
-timepoint = unique(metadata$Factor.Value..time.);
+genetable = read.table('genenames.csv', sep=',', header=T, stringsAsFactors = TRUE);
+metadata = read.table('E-MEXP-850.sdrf.txt', header=TRUE, sep='\t', stringsAsFactors = TRUE);
 probes <- read.table("Probes.txt",header=TRUE,sep="\t",as.is=TRUE);
 spottypes <- readSpotTypes("spottypes.txt");
 
 
-fit = createLM(names, probes, spottypes, metadata);
+fit = createLM(unique(metadata$FileName), probes, spottypes, metadata);
 topTable(fit)$Name;
 candidategenes= c('G01_o232_plate_16');
 
@@ -175,7 +169,7 @@ candidategenes= c('G01_o232_plate_16');
 # plot genes
 for(probeNameProfile in candidategenes)
 {
-  i = which(MA$genes$Name == probeNameProfile);
+  i = which(fit$genes$Name == probeNameProfile);
   j = which(genetable$Probe_name == probeNameProfile);
   plotProfile(fit$t[i,], probeNameProfile, genetable$Category_description_blasthit[j], 'timepoint', 'intensity (log10)');
   if(readline(probeNameProfile) == 'q' ) { break();}
