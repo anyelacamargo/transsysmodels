@@ -1,4 +1,5 @@
-rm(list=ls())
+## jtk: not necessary -- scripts should be run in clean R process (R CMD BATCH or similar)
+## rm(list=ls())
 library("affy")   # Affymetrix pre-processing
 library("limma") 
 #library(som);
@@ -82,23 +83,37 @@ readEmpiricalData <- function(fname)
 
 plotProfile <- function(e, probeName, geneName, xname, yname)
 {
-  
   p <- as.numeric(e)
   barplot(p, main = geneName, names.arg = names(e), las = 2, col = "red", xlab = xname, ylab = yname );
 }
 
 
-
-readData <- function(names, probes, spottypes)
+readData <- function(filenameList, probesFname, spottypesFname)
 {
-  
-  RG <- read.maimages(files = names, columns = list(Rf = "ArrayWoRx:S_Cy5", 
-                                               Gf = "ArrayWoRx:S_Cy3", Rb = "ArrayWoRx:B_Cy5",
-                                               Gb = "ArrayWoRx:B_Cy3"));
+  columnList <- list(Rf = "ArrayWoRx:S_Cy5", 
+                     Gf = "ArrayWoRx:S_Cy3",
+                     Rb = "ArrayWoRx:B_Cy5",
+                     Gb = "ArrayWoRx:B_Cy3");
+  RG <- read.maimages(files = filenameList, columns = columnList);
+  probes <- read.table(probesFname, header = TRUE, sep = "\t", as.is = TRUE);
+  spottypes <- readSpotTypes(spottypesFname);
   RG$genes <- probes;
   RG$printer <- getLayout(probes);
-  RG$genes$Status <- controlStatus(spottypes,RG);
+  RG$genes$Status <- controlStatus(spottypes, RG);
   return(RG);
+}
+
+
+readGregersenData <- function(genetableFname, metadataFname, probesFname, spottypesFname)
+{
+  g <- list();
+  ## FIXME: should do this only when necessary?
+  unzip("E-MEXP-850.raw.1.zip");
+  g$genetable <- read.table(genetableFname, sep = ",", header = TRUE, stringsAsFactors = FALSE);
+  g$metadata <- read.table(metadataFname, header = TRUE, sep = "\t", stringsAsFactors = FALSE);
+  filenameList <- unique(g$metadata$FileName);
+  g$RG <- readData(filenameList, probesFname, spottypesFname);
+  return(g);
 }
 
   
@@ -132,46 +147,47 @@ getTargets <- function(metadata)
   
 fitModel <- function(MA, design)
 {
-  
   fit <- lmFit(MA, design);
   fit <- eBayes(fit);
   return(fit);
-
 }
 
+
 # create model and get data
-createLM <- function(names, probes, spottypes, metadata)
+createLM <- function(g)
 {
-  RG <- readData(names, probes, spottypes);
-  MA <- normaliseData(RG);
-  targets <- getTargets(metadata);
+  MA <- normaliseData(g$RG);
+  targets <- getTargets(g$metadata);
+  ## FIXME: is -5dap the appropriate reference?
   design <- modelMatrix(targets, ref = "-5")
   f <- fitModel(MA, design);
   return(f);
-  
 }
-
-
-
-unzip("E-MEXP-850.raw.1.zip");
-genetable <- read.table("genenames.csv", sep = ",", header = TRUE, stringsAsFactors = TRUE);
-metadata <- read.table("E-MEXP-850.sdrf.txt", header = TRUE, sep = "\t", stringsAsFactors = TRUE);
-probes <- read.table("Probes.txt",header = TRUE, sep = "\t", as.is = TRUE);
-spottypes <- readSpotTypes("spottypes.txt");
-
-
-fit <- createLM(unique(metadata$FileName), probes, spottypes, metadata);
-topTable(fit)$Name;
-candidategenes <- c("G01_o232_plate_16");
 
 
 # plot genes
-for(probeNameProfile in candidategenes)
+plotGenes <- function(fit, genetable, probeList)
 {
-  i <- which(fit$genes$Name == probeNameProfile);
-  j <- which(genetable$Probe_name == probeNameProfile);
-  plotProfile(fit$t[i,], probeNameProfile, genetable$Category_description_blasthit[j], 
-              "timepoint", "intensity (log10)");
-  if(readline(probeNameProfile) == "q" ) { break();}
-  
+  for(probeNameProfile in probeList$probeName)
+  {
+    i <- which(fit$genes$Name == probeNameProfile);
+    j <- which(genetable$Probe_name == probeNameProfile);
+    geneDescription <- genetable$Category_description_blasthit[j];
+    plotProfile(fit$t[i,], probeNameProfile, geneDescription, "timepoint", "intensity (log10)");
+    if(readline(sprintf("%s %s", probeNameProfile, geneDescription)) == "q" ) { break();}
+  }
 }
+
+
+## jtk: following http://stackoverflow.com/questions/3548090/facet-grid-problem-input-string-1-is-invalid-in-this-locale
+## bioconductor seems a bit locale-sensitive (yes, locales are ugly stuff anyway)
+Sys.setlocale(locale="C")
+
+g <- readGregersenData("genenames.csv", "E-MEXP-850.sdrf.txt", "Probes.txt", "spottypes.txt");
+
+fit <- createLM(g);
+topTable(fit)$Name;
+candidategenes <- c("G01_o232_plate_16");
+probeList <- read.csv("probelist.csv");
+plotGenes(fit, g$genetable, probeList);
+
