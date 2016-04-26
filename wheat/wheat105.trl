@@ -14,7 +14,7 @@ transsys wg
 
   factor senescence
   {
-    decay: 1.0;
+    decay: 0.2;
     diffusibility: 0.0;
   }
 
@@ -41,7 +41,7 @@ transsys wg
     decay: 1.0;
     diffusibility: 0.0;
   }
-    
+
 
   factor growphytomer
   {
@@ -65,7 +65,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: 0.5 * (senescence < 1.0);
+      constitutive: 0.5 - senescence * 0.5;
     }
     product
     {
@@ -77,7 +77,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: 250.0 + senescence * 3000;
+      senescence: activate(0.05, 0.5);
     }
     product
     {
@@ -89,7 +89,7 @@ transsys wg
   {
     promoter
     {
-      constitutive: localtime > 100;
+      constitutive: (localtime > 80) * 0.2;
     }
     product
     {
@@ -180,6 +180,9 @@ lsys wheat
   symbol internode(wg);
   symbol mesocotyl(wg);
   symbol blade(wg);
+  symbol inflorescenceinternode(wg);
+  symbol floret(wg);
+  symbol awn(wg);
   symbol branch;
   symbol r;
   symbol grainshell;
@@ -202,9 +205,18 @@ lsys wheat
   rule makephytomer
   {
     # tillering not modelled currently
-    meristem(t) : (t.growphytomer >= 1) && (t.vegetative == 1.0)-->
+    meristem(t) : (t.growphytomer >= 1) && (t.vegetative == 1.0) -->
     [ blade(transsys t: localtime = 0.0, growphytomer = 0.0) ]
-    internode(transsys t: localtime = 0.0, growphytomer = 0.0, internodelength = 0.01)
+    internode(transsys t: localtime = 0.0, growphytomer = 0.0, internodelength = 0.05)
+    r
+    meristem(transsys t: growphytomer = 0.0)
+  }
+
+  rule makefloret
+  {
+    meristem(t) : (t.growphytomer >= 1) && (t.vegetative < 1.0)  -->
+    [ floret(transsys t: localtime = 0.0, growphytomer = 0.0) awn(transsys t: localtime = 0.0, growphytomer = 0.0) ]
+    inflorescenceinternode(transsys t: localtime = 0.0, growphytomer = 0.0)
     r
     meristem(transsys t: growphytomer = 0.0)
   }
@@ -225,9 +237,30 @@ lsys wheat
     internode
     {
       move(internodelength * 0.5);
-      color(0.0, 1.0, 0.0);
+      color(1.0 - chlorophyll * 2, 1.0, 0.0);
       cylinder(0.2, internodelength);
       move(internodelength * 0.5);
+    }
+    inflorescenceinternode
+    {
+      move(0.05);
+      color(0, 0, 1);
+      cylinder(0.2, 0.1);
+      move(0.05);
+    }
+    floret
+    {
+      bank(60);
+      move(0.3);
+      color(1.0, 0.7, 0.7);
+      sphere(0.15);
+    }
+    awn
+    {
+      bank(-50);
+      color(1, 1, 0);
+      move(1.0);
+      cylinder(0.1, 2.0);
     }
     mesocotyl
     {
@@ -243,7 +276,6 @@ lsys wheat
       color(1.0 - chlorophyll * 2, 1.0, 0.0);
       move(2.0);
       box(1.0, 0.05, 4.0);
-      move(1.0);
     }
     meristem
     {
