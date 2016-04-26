@@ -40,11 +40,11 @@ findEmpiricalProfile <- function(e, probeName, dayList)
 }
 
 
-readEmpiricalTable <- function(fname, dayList)
+readEmpiricalTable <- function(fname, dayList, probeNameColumn = "probes.Name.i.")
 {
   e <- read.csv(fname, stringsAsFactors = FALSE);
   ## FIXME: should check that dayList and number of columns match up
-  rownames(e) <- e[["probes.Name.i."]];
+  rownames(e) <- e[[probeNameColumn]];
   colnames(e)[3:10] <- makeDayNames(dayList);
   return(e);
 }
@@ -84,6 +84,8 @@ plotProfiles <- function(w, probeFactorTable, dayList, waitFunc = function(m) { 
 }
 
 
+# tentative mapping from days past (before) pollination to days of life based on
+# http://www.extension.umn.edu/agriculture/small-grains/growth-and-development/spring-wheat/ , fig. 1
 dayList <- c(58L, 63L, 73L, 83L, 88L, 93L, 99L, 105L);
 probeFactorTable <- data.frame(
   factorName = c("pheophorbide_oxygenase"),

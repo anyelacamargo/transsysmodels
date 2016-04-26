@@ -195,6 +195,7 @@ lsys wheat
     mesocotyl(transsys t: growphytomer = 0.0)
     [ blade(transsys t: localtime = 0.0, growphytomer = 0.0) ]
     internode(transsys t: internodelength = 0.1, growphytomer = 0.0)
+    r
     meristem(transsys t: growphytomer = 0.0)
   }
 
@@ -241,7 +242,7 @@ lsys wheat
       bank(40);
       color(1.0 - chlorophyll * 2, 1.0, 0.0);
       move(2.0);
-      box(0.5, 0.05, 4.0);
+      box(1.0, 0.05, 4.0);
       move(1.0);
     }
     meristem
