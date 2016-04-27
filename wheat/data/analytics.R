@@ -120,7 +120,8 @@ readGregersenData <- function(genetableFname, metadataFname, probesFname, spotty
 normaliseData <- function(data)
 {
   RG <- data;
-  MA <- normalizeWithinArrays(RG);
+  #MA <- normalizeWithinArrays(RG);
+  MA <- normalizeWithinArrays(RG, bc.method="none");
   return(MA);
   
 }
@@ -154,12 +155,13 @@ fitModel <- function(MA, design)
 
 
 # create model and get data
-createLM <- function(g)
+createLM <- function(g, tref)
 {
   MA <- normaliseData(g$RG);
   targets <- getTargets(g$metadata);
+  print(targets)
   ## FIXME: is -5dap the appropriate reference?
-  design <- modelMatrix(targets, ref = "-5")
+  design <- modelMatrix(targets, ref = tref)
   f <- fitModel(MA, design);
   return(f);
 }
@@ -173,7 +175,9 @@ plotGenes <- function(fit, genetable, probeList)
     i <- which(fit$genes$Name == probeNameProfile);
     j <- which(genetable$Probe_name == probeNameProfile);
     geneDescription <- genetable$Category_description_blasthit[j];
-    plotProfile(fit$t[i,], probeNameProfile, geneDescription, "timepoint", "intensity (log10)");
+    #png('plot.png')
+    plotProfile(fit$coefficients[i,], probeNameProfile, geneDescription, "timepoint", "intensity (log10)");
+#dev.off()
     if(readline(sprintf("%s %s", probeNameProfile, geneDescription)) == "q" ) { break();}
   }
 }
@@ -185,7 +189,8 @@ Sys.setlocale(locale="C")
 
 g <- readGregersenData("genenames.csv", "E-MEXP-850.sdrf.txt", "Probes.txt", "spottypes.txt");
 
-fit <- createLM(g);
+fit <- createLM(g, '-5')
+print('hello')
 topTable(fit)$Name;
 candidategenes <- c("G01_o232_plate_16");
 probeList <- read.csv("probelist.csv");
