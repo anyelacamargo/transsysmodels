@@ -127,6 +127,24 @@ normaliseData <- function(data)
 }
 
 
+changeNameArray = function(targettable)
+{
+  
+  for(cn in colnames(targettable))
+  {
+    for(n in lc)
+    {
+      for(i in 1:8)
+      {
+        o = which(levels(targettable[[cn]]) == n)
+        levels(targettable[[cn]])[i] = paste('t',i, sep='');
+      }
+        
+    }
+  }
+  return(targettable)
+}
+
 getTargets <- function(metadata)
 {
   
@@ -159,6 +177,7 @@ createLM <- function(g, tref)
 {
   MA <- normaliseData(g$RG);
   targets <- getTargets(g$metadata);
+  targets = changeNameArray(targets)
   print(targets)
   ## FIXME: is -5dap the appropriate reference?
   design <- modelMatrix(targets, ref = tref)
@@ -189,10 +208,14 @@ Sys.setlocale(locale="C")
 
 g <- readGregersenData("genenames.csv", "E-MEXP-850.sdrf.txt", "Probes.txt", "spottypes.txt");
 
-fit <- createLM(g, '-5')
-print('hello')
+fit <- createLM(g, 't1') # fit using t1 as reference
 topTable(fit)$Name;
 candidategenes <- c("G01_o232_plate_16");
 probeList <- read.csv("probelist.csv");
 plotGenes(fit, g$genetable, probeList);
 
+# Gregersen
+eb <-eBayes(fit);
+cont.matrix2 <- makeContrasts(t8vst2=t8-t2,levels=fit$design)  #I only tested between the very late stage and the flag leaf around pollination.
+fit1c <- eBayes(contrasts.fit(fit, cont.matrix2))  # this orders the genes according to their differential expression between t8 and t2 (late and early).
+plotGenes(fit1c, g$genetable, probeList);
