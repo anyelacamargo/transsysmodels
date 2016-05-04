@@ -100,6 +100,8 @@ readData <- function(filenameList, probesFname, spottypesFname)
   RG$genes <- probes;
   RG$printer <- getLayout(probes);
   RG$genes$Status <- controlStatus(spottypes, RG);
+  RG$weights<-as.matrix(read.table(file="weights.txt",header=TRUE,sep="\t"));
+  
   return(RG);
 }
 
@@ -121,7 +123,17 @@ normaliseData <- function(data)
 {
   RG <- data;
   #MA <- normalizeWithinArrays(RG);
-  MA <- normalizeWithinArrays(RG, bc.method="none");
+  print('hehere1')
+  RGnb <- backgroundCorrect(RG,method="none")
+  print('hehere2')
+  MAnorm <- normalizeWithinArrays(RGnb,span=0.4)
+  print('hehere3')
+  MAnormxscale<- normalizeBetweenArrays(MAnorm,method="scale")
+  print('hehere4')
+  MAgenesonly<-MAnormxscale[MAnormxscale$genes$Status=="Gene",]
+  print('hehere5')
+  #MA <- normalizeWithinArrays(RG, bc.method="none");
+  
   return(MA);
   
 }
