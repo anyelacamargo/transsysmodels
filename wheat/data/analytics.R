@@ -31,7 +31,8 @@ softwarebin = function()
   }
   
   
-  
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("affy")
   #
   colnames(db) = tname; # chance colnames to timepoints
   db = MeanPerCol(timepoint, db); # Get mean per timepopint, reduce to one column
@@ -134,7 +135,7 @@ normaliseData <- function(data)
   print('hehere5')
   #MA <- normalizeWithinArrays(RG, bc.method="none");
   
-  return(MA);
+  return(MAgenesonly);
   
 }
 
@@ -144,15 +145,15 @@ changeNameArray = function(targettable)
   
   for(cn in colnames(targettable))
   {
-    for(n in lc)
-    {
+    #for(n in lc)
+    #{
       for(i in 1:8)
       {
-        o = which(levels(targettable[[cn]]) == n)
+        #o = which(levels(targettable[[cn]]) == n)
         levels(targettable[[cn]])[i] = paste('t',i, sep='');
       }
         
-    }
+    #}
   }
   return(targettable)
 }
