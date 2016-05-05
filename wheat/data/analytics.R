@@ -124,15 +124,15 @@ normaliseData <- function(data)
 {
   RG <- data;
   #MA <- normalizeWithinArrays(RG);
-  print('hehere1')
+  
   RGnb <- backgroundCorrect(RG,method="none")
-  print('hehere2')
+  
   MAnorm <- normalizeWithinArrays(RGnb,span=0.4)
-  print('hehere3')
+  
   MAnormxscale<- normalizeBetweenArrays(MAnorm,method="scale")
-  print('hehere4')
+ 
   MAgenesonly<-MAnormxscale[MAnormxscale$genes$Status=="Gene",]
-  print('hehere5')
+ 
   #MA <- normalizeWithinArrays(RG, bc.method="none");
   
   return(MAgenesonly);
