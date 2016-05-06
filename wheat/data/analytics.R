@@ -99,9 +99,9 @@ readData <- function(filenameList, probesFname, spottypesFname)
   probes <- read.table(probesFname, header = TRUE, sep = "\t", as.is = TRUE);
   spottypes <- readSpotTypes(spottypesFname);
   RG$genes <- probes;
-  RG$printer <- getLayout(probes);
-  RG$genes$Status <- controlStatus(spottypes, RG);
-  RG$weights<-as.matrix(read.table(file="weights.txt",header=TRUE,sep="\t"));
+  RG$printer <- getLayout(probes)
+  RG$genes$Status <- controlStatus(spottypes,RG)
+  RG$weights<-as.matrix(read.table(file="weights.txt",header=TRUE,sep="\t"))
   
   return(RG);
 }
@@ -115,7 +115,7 @@ readGregersenData <- function(genetableFname, metadataFname, probesFname, spotty
   g$genetable <- read.table(genetableFname, sep = ",", header = TRUE, stringsAsFactors = FALSE);
   g$metadata <- read.table(metadataFname, header = TRUE, sep = "\t", stringsAsFactors = FALSE);
   filenameList <- unique(g$metadata$FileName);
-  g$RG <- readData(filenameList, probesFname, spottypesFname);
+  g$RG <- readData(sort(filenameList), probesFname, spottypesFname);
   return(g);
 }
 
@@ -145,15 +145,15 @@ changeNameArray = function(targettable)
   
   for(cn in colnames(targettable))
   {
-    #for(n in lc)
-    #{
+
+
       for(i in 1:8)
       {
-        #o = which(levels(targettable[[cn]]) == n)
+      
         levels(targettable[[cn]])[i] = paste('t',i, sep='');
       }
         
-    #}
+
   }
   return(targettable)
 }
@@ -190,8 +190,11 @@ createLM <- function(g, tref)
 {
   MA <- normaliseData(g$RG);
   targets <- getTargets(g$metadata);
-  targets = changeNameArray(targets)
-  print(targets)
+  targets = changeNameArray(targets);
+  targets <- targets[order(row.names(targets)),]
+  targets = targets[,c(2,1)]
+  print(targets);
+  targets <- readTargets("targets.txt");
   ## FIXME: is -5dap the appropriate reference?
   design <- modelMatrix(targets, ref = tref)
   f <- fitModel(MA, design);
