@@ -98,6 +98,7 @@ readData <- function(filenameList, probesFname, spottypesFname)
   RG <- read.maimages(files = filenameList, columns = columnList);
   probes <- read.table(probesFname, header = TRUE, sep = "\t", as.is = TRUE);
   probes = probes[order(probes$Pos),]
+  
   spottypes <- readSpotTypes(spottypesFname);
   RG$genes <- probes;
   RG$printer <- getLayout(probes);
@@ -191,10 +192,11 @@ fitModel <- function(MA, design)
 createLM <- function(g, tref)
 {
   MA <- normaliseData(g$RG);
-  targets1 <- getTargets(g$metadata);
-  targets <- readTargets("Targets.txt");
-  targets1 = changeNameArray(targets1)
-  print(targets)
+  targets <- getTargets(g$metadata);
+  targets = changeNameArray(targets)
+  targets = targets[order(rownames(targets)),];
+  targets = targets[, c(2,1)];
+ 
   ## FIXME: is -5dap the appropriate reference?
   design <- modelMatrix(targets, ref = tref)
   f <- fitModel(MA, design);
@@ -234,4 +236,4 @@ plotGenes(fit, g$genetable, probeList);
 eb <-eBayes(fit);
 cont.matrix2 <- makeContrasts(t8vst2=t8-t2,levels=fit$design)  #I only tested between the very late stage and the flag leaf around pollination.
 fit1c <- eBayes(contrasts.fit(fit, cont.matrix2))  # this orders the genes according to their differential expression between t8 and t2 (late and early).
-plotGenes(fit1c, g$genetable, probeList);
+#plotGenes(fit1c, g$genetable, probeList);
