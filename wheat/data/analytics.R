@@ -97,6 +97,7 @@ readData <- function(filenameList, probesFname, spottypesFname)
                      Gb = "ArrayWoRx:B_Cy3");
   RG <- read.maimages(files = filenameList, columns = columnList);
   probes <- read.table(probesFname, header = TRUE, sep = "\t", as.is = TRUE);
+  probes = probes[order(probes$Pos),]
   spottypes <- readSpotTypes(spottypesFname);
   RG$genes <- probes;
   RG$printer <- getLayout(probes);
@@ -114,7 +115,8 @@ readGregersenData <- function(genetableFname, metadataFname, probesFname, spotty
   unzip("E-MEXP-850.raw.1.zip");
   g$genetable <- read.table(genetableFname, sep = ",", header = TRUE, stringsAsFactors = FALSE);
   g$metadata <- read.table(metadataFname, header = TRUE, sep = "\t", stringsAsFactors = FALSE);
-  filenameList <- unique(g$metadata$FileName);
+  filenameList <- sort(unique(g$metadata$FileName));
+  print(filenameList)
   g$RG <- readData(filenameList, probesFname, spottypesFname);
   return(g);
 }
@@ -189,8 +191,9 @@ fitModel <- function(MA, design)
 createLM <- function(g, tref)
 {
   MA <- normaliseData(g$RG);
-  targets <- getTargets(g$metadata);
-  targets = changeNameArray(targets)
+  targets1 <- getTargets(g$metadata);
+  targets <- readTargets("Targets.txt");
+  targets1 = changeNameArray(targets1)
   print(targets)
   ## FIXME: is -5dap the appropriate reference?
   design <- modelMatrix(targets, ref = tref)
