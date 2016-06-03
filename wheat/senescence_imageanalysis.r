@@ -315,11 +315,12 @@ transformData = function(filename)
   for(subdata in m[2:length(m)])
   {
     s1 = createAverageperDate(subdata);
-    subdata = merge(subdata, s, all=TRUE);
+    s = merge(s, s1, all=TRUE);
   }
-  return(subdata);
+  return(s);
 }
 
 
 filename = 'doodle.txt';
 avgData = transformData(filename)
+write.table(avgData, file = 'avgData.csv', sep=',', quote=F, row.names=F)
