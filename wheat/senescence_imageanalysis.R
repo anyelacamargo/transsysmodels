@@ -1,4 +1,6 @@
-library(gdata);
+library("ggplot2");
+## FIXME: what do we need gdata for?
+library("gdata");
 
 
 readEmpirical <- function(fname, cutoff)
