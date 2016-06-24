@@ -6,6 +6,30 @@ transsys wg
     diffusibility: 0.0;
   }
 
+  factor asp_at_cyto
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
+  factor asp_at_plast
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
+  factor asp_at_mito
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
+  factor cathepsin_b
+  {
+    decay: 0.0;
+    diffusibility: 0.0;
+  }
+
   factor chlorophyll
   {
     decay: 0.5 + pheophorbide_oxygenase;

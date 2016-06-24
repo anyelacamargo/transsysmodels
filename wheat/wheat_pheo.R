@@ -50,12 +50,22 @@ readEmpiricalTable <- function(fname, dayList, probeNameColumn = "probes.Name.i.
 }
 
 
-readWheat <- function(dayList)
+logExpressionMatrix <- function(m, pseudoCount = NULL)
+{
+  if (is.null(pseudoCount))
+  {
+    pseudoCount <-
+  }
+}
+
+
+readWheat <- function(trsysPrg, dayList)
 {
   numDays <- max(dayList);
+  message(sprintf("numDays = %d", numDays));
   w <- list();
   w$e <- readEmpiricalTable("data/csv/empiric_candidate_v1.csv", dayList);
-  w$t <- transexprTable("wheat_pheo.trl", numDays);
+  w$t <- transexprTable(trsysPrg, numDays);
   return(w)
 }
 
@@ -66,6 +76,28 @@ plotProfile <- function(p, ...)
 }
 
 
+correlationScore <- function(w, probeFactorTable, dayList)
+{
+  probeNameList <- rownames(probeFactorTable);
+  s <- 0.0;
+  for (probeName in probeNameList)
+  {
+    if (probeName %in% rownames(w$e))
+    {
+      factorName <- probeFactorTable[probeName, "factorName"];
+      pEmpirical <- findEmpiricalProfile(w$e, probeName, dayList);
+      pTransexpr <- findTransexprProfile(w$t, factorName, dayList);
+      s <- s + (1.0 - cor(pEmpirical, pTransexpr)) * 0.5;
+    }
+    else
+    {
+      stop(sprintf("probe %s not in empirical data", probeName));
+    }
+  }
+  return(s);
+}
+
+
 plotProfiles <- function(w, probeFactorTable, dayList, waitFunc = function(m) { readline(m); })
 {
   opar <- par(no.readonly = TRUE);
@@ -73,15 +105,36 @@ plotProfiles <- function(w, probeFactorTable, dayList, waitFunc = function(m) { 
   probeNameList <- rownames(probeFactorTable);
   for (probeName in probeNameList)
   {
-    factorName <- probeFactorTable[probeName, "factorName"];
-    pEmpirical <- findEmpiricalProfile(w$e, probeName, dayList);
-    pTransexpr <- findTransexprProfile(w$t, factorName, dayList);
-    plotProfile(pEmpirical);
-    plotProfile(pTransexpr);
-    waitFunc(sprintf("%s:%s", probeName, factorName));
+    if (probeName %in% rownames(w$e))
+    {
+      factorName <- probeFactorTable[probeName, "factorName"];
+      pEmpirical <- findEmpiricalProfile(w$e, probeName, dayList);
+      pTransexpr <- findTransexprProfile(w$t, factorName, dayList);
+      plotProfile(pEmpirical);
+      plotProfile(pTransexpr);
+      r <- cor(pEmpirical, pTransexpr);
+      waitFunc(sprintf("%s:%s, r = %f", probeName, factorName, r));
+    }
+    else
+    {
+      message(sprintf("probe %s not in empirical data", probeName));
+    }
   }
   par(opar);
 }
+
+
+readProbeFactorTable <- function(fname)
+{
+  d <- read.csv(fname, stringsAsFactors = FALSE);
+  if (length(unique(d$probeName)) != nrow(d))
+  {
+    stop("probeName not unique");
+  }
+  rownames(d) <- d$probeName;
+  return(d);
+}
+
 
 
 # tentative mapping from days past (before) pollination to days of life based on
@@ -93,5 +146,6 @@ probeFactorTable <- data.frame(
   );
 rownames(probeFactorTable) <-  c("TA-PaO_clone_39");
 
-w <- readWheat(dayList);
+probeFactorTable <- readProbeFactorTable("data/probelist.csv");
+w <- readWheat("wheat105.trl", dayList);
 plotProfiles(w, probeFactorTable, dayList);
