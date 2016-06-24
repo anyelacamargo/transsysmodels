@@ -277,6 +277,14 @@ doodleLsys <- function()
 }
 
 
+## FIXME: unnecessary, does nothing -- delete?
+findExtremes = function(d)
+{
+  print(min(d))
+  
+}
+
+
 # FIXME: canonicalise (use "<-" assignment, boolean constants, double quotes etc.)
 # FIXME: separate data from code
 
