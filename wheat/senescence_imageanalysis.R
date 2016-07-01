@@ -280,7 +280,7 @@ doodleLsys <- function()
 
 
 ## FIXME: unnecessary, does nothing -- delete?
-findExtremes = function(d)
+findExtremes <- function(d)
 {
   print(min(d))
   
@@ -290,9 +290,9 @@ findExtremes = function(d)
 # FIXME: canonicalise (use "<-" assignment, boolean constants, double quotes etc.)
 # FIXME: separate data from code
 
-createAverageperDate = function(sdata)
+createAverageperDate <- function(sdata)
 {
-  g = aggregate(cbind(X0,X1,X2,X3,X4,X5,X6,X7,
+  g <- aggregate(cbind(X0,X1,X2,X3,X4,X5,X6,X7,
                       X8,X9,X10,X11,X12,X13,X14,X15,X16,X17,
                       X18,X19,X20,X21,X22,X23,X24,X25,X26,X27,
                       X28,X29,X30,X31,X32,X33,X34,X35,X36,X37,
@@ -308,31 +308,32 @@ createAverageperDate = function(sdata)
   return(g);
 }
 
-calibratedata = function(data)
+
+calibratedata <- function(data)
 {
-  copydata = data;
+  copydata <- data;
   for(tdate in unique(copydata$time))
   {
     t = which(copydata$time == tdate);
-    for(i in 3:(ncol(copydata)-2))
+    for(i in 3:(ncol(copydata) - 2))
     {
       if(as.Date(tdate) <= as.Date("2015-04-01")) 
-      { 
-        copydata[t,i] = copydata[t,i]*0.27;
+      {
+        copydata[t, i] <- copydata[t, i] * 0.27;
       }
-      else 
+      else
       { 
-        copydata[t,i] = copydata[t,i]*0.46;
+        copydata[t, i] <- copydata[t, i] * 0.46;
       }
     }
   }    
-  return(copydata)
+  return(copydata);
 }
 
 
-convert2numeric = function(data, col_list)
+convert2numeric <- function(data, col_list)
 {
-  copydata=data;
+  copydata <- data;
   for(cname in col_list)
   {
     copydata[[cname]] = as.numeric(as.character(copydata[[cname]]))
@@ -341,67 +342,69 @@ convert2numeric = function(data, col_list)
 }
 
 
-transformData = function(filename)
+transformData <- function(filename)
 {
-  cdata = read.table(filename, header=T, sep=',');
-  m  = split(cdata, cdata$timestamp);
-  i = 1;
-  subdata = m[[i]];
-  s = createAverageperDate(subdata);
+  cdata <- read.table(filename, header = TRUE, sep = ",");
+  m <- split(cdata, cdata$timestamp);
+  i <- 1;
+  subdata <- m[[i]];
+  s <- createAverageperDate(subdata);
   for(subdata in m[2:length(m)])
   {
-    s1 = createAverageperDate(subdata);
-    s = merge(s, s1, all=TRUE);
+    s1 <- createAverageperDate(subdata);
+    s <- merge(s, s1, all = TRUE);
   }
   return(s);
 }
 
 
-get_subdata = function(data, conver_table, intens)
+get_subdata <- function(data, conver_table, intens)
 {
   
-  copydata = data;
+  copydata <- data;
   # I us want to use the same intensities # Vey crude way but it seems they're the most relevants.
   
-  u = colnames(copydata) %in% intens; # Search for intens
-  scc1= data.frame(idtag = copydata$idtag, 
-                   time = copydata$time, copydata[,u]); # Create frame with sel intensi 
-  freq = colnames(scc1)[3:dim(scc1)[2]];
-  freq = as.numeric(sub("X", "", freq));
-  colnames(scc1)[3:dim(scc1)[2]] = freq; # Delete X in columns
+  u <- colnames(copydata) %in% intens; # Search for intens
+  scc1 <- data.frame(idtag = copydata$idtag, 
+                   time = copydata$time, copydata[ ,u]); # Create frame with sel intensi
+  ## FIXME: dim(scc1)[2] looks like equivalent to ncol to me
+  freq <- colnames(scc1)[3:dim(scc1)[2]];
+  freq <- as.numeric(sub("X", "", freq));
+  colnames(scc1)[3:dim(scc1)[2]] <- freq; # Delete X in columns
   #write.table(scc1, file='t.csv', sep=',', row.names=F);
   
-  mm = as.matrix(scc1[, 3:dim(scc1)[2]]); # Deletes -4
-  vector_data = unmatrix(mm,byrow=T); # Convert matrix into vector
-  vector_data = as.numeric(vector_data); # Convert values to numeric
-  idtag = as.character(unique(scc1$idtag)); # Unique idtags
-  time = as.character(unique(scc1$time)) # unique time points
-  hexlist = convert2hex(freq, conver_table); # 
-  conveg = expand.grid(idtag=idtag, intensity=hexlist,time=time);
-  cdata = data.frame(conveg, value=vector_data);
+  mm <- as.matrix(scc1[, 3:dim(scc1)[2]]); # Deletes -4
+  vector_data <- unmatrix(mm,byrow=T); # Convert matrix into vector
+  vector_data <- as.numeric(vector_data); # Convert values to numeric
+  idtag <- as.character(unique(scc1$idtag)); # Unique idtags
+  time <- as.character(unique(scc1$time)) # unique time points
+  hexlist <- convert2hex(freq, conver_table); # 
+  conveg <- expand.grid(idtag=idtag, intensity=hexlist,time=time);
+  cdata <- data.frame(conveg, value=vector_data);
   return(cdata);
 }
 
+
+## FIXME: what are data1, data2?
 convert2hex <- function(data1, data2)
 {
-  copydata1 = data1;
-  copydata2 = data2;
-  hexlist = c();
+  copydata1 <- data1;
+  copydata2 <- data2;
+  hexlist <- c();
   
   for(i in 1:length(copydata1))
   {
-    idx = which(copydata2$i == copydata1[i])
-    hexlist = append(hexlist, as.character(copydata2[idx,5]));
-    
+    idx <- which(copydata2$i == copydata1[i])
+    hexlist <- append(hexlist, as.character(copydata2[idx, 5]));
   }
   return(hexlist)
 }
 
 
-print_plot = function(data, tname)
+print_plot <- function(data, tname)
 {
-  copydata = data;
-  p = ggplot(copydata,aes(x = time, y = value, fill=intensity, group=intensity)) +
+  copydata <- data;
+  p <- ggplot(copydata,aes(x = time, y = value, fill = intensity, group = intensity)) +
     geom_area() + geom_line(aes(ymax=value), position="stack") +
     scale_fill_manual(values = as.character(unique(copydata$intensity))) + 
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ggtitle(tname);
@@ -411,17 +414,17 @@ print_plot = function(data, tname)
 
 plotDoodle <- function()
 {
-  it = read.table('contable.csv', header=T, sep=',');
-  it = data.frame(it, hex=rgb(it[,2:4], max=255));
+  it <- read.table("contable.csv", header = TRUE, sep = ",");
+  it <- data.frame(it, hex = rgb(it[ ,2:4], max = 255));
   ## Select intensities
-  intens = c(1,4,5,16,20,21,24,25,26,27,30,31,32,50,54,55,60,108,112,116);
-  filename = 'doodle.csv';
-  avgData = transformData(filename);
-  avgData = data.frame('w8',avgData);
-  colnames(avgData) = c('idtag','time', as.character(1:(ncol(avgData)-2)));
-  avgData = convert2numeric(avgData, colnames(avgData)[3:(ncol(avgData)-2)]);
-  avgData = calibratedata(avgData);
-  cdatacal = get_subdata(avgData, it, intens);
-  print_plot(cdatacal, 'average');
-  write.table(avgData, file = 'avgData.csv', sep=',', quote=F, row.names=F)
+  intens = c(1, 4, 5, 16, 20, 21, 24, 25, 26, 27, 30, 31, 32, 50, 54, 55, 60, 108, 112, 116);
+  filename <- "doodle.csv";
+  avgData <- transformData(filename);
+  avgData <- data.frame('w8', avgData);
+  colnames(avgData) <- c("idtag", "time", as.character(1:(ncol(avgData)-2)));
+  avgData <- convert2numeric(avgData, colnames(avgData)[3:(ncol(avgData)-2)]);
+  avgData <- calibratedata(avgData);
+  cdatacal <- get_subdata(avgData, it, intens);
+  print_plot(cdatacal, "average");
+  write.table(avgData, file = "avgData.csv", sep = ",", quote = FALSE, row.names = FALSE)
 }
