@@ -1,0 +1,116 @@
+\documentclass[a4paper,fleqn]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage[english]{babel}
+\usepackage{alltt}
+\usepackage{moreverb}
+\usepackage{pstricks}
+
+
+\textheight 23cm \textwidth 16cm
+\oddsidemargin 0pt \evensidemargin 0pt
+
+\newcommand{\todo}[1]{
+  \rule{0pt}{0pt}\marginpar{{\color{blue}\rule{1ex}{1ex}}}
+  {[\textbf{\color{blue}todo:} #1]}}
+
+
+\begin{document}
+\title{Notes on Integrative transsys Modelling of Wheat at
+  GRN and Phenomics Levels}
+\author{Anyela Camargo, Jan T Kim}
+\maketitle
+
+
+\section{Objectives}
+
+\subsection{Key Objectives}
+
+\subsubsection{Demonstrate Pixel Frequency Based Scoring}
+
+Wheat plants have been imaged (and scored in terms of developmental
+stage) at multiple time points. The objectives are
+\begin{itemize}
+\item to generate comparable images from L-transsys simulations,
+\item to devise a score to compare images
+\item to demonstrate the ability / potential of this score to
+  discriminate between models.
+\end{itemize}
+
+
+\subsection{Perspectives}
+
+\subsubsection{Integrate Gene Expression Level}
+
+\todo{summarise idea and problems with Gregersen stuff}
+
+\subsubsection{Ideas, Open Issues}
+
+\begin{itemize}
+\item Consider a score that does not require quantisation and that is
+  less sensitive and degrades gracefully in the presence of random
+  fluctuations?
+\item Capture and model biological variation
+\end{itemize}
+
+
+\section{Work}
+
+\subsection{Key Objectives}
+
+\subsubsection{Pixel Frequency Based Scoring}
+
+From each image, a colour frequency profile comprised of the frequency
+values of pixels of each colour is determined. These colour frequency
+profiles are then compared using a score based on Euclidean or
+correlation distance.
+
+Colours will be coarsely quantised (at least in initial approaches),
+to avoid excessive sensitivity to colour settings in simulations
+and to random fluctuation in empirical measurements (e.g.\ due to
+changes in ambient light conditions).
+
+
+\textbf{Requirements and Progress:}
+
+\begin{itemize}
+\item \textit{Generate images from L-transsys model:} Prototype
+implemented
+\item \textit{Compute pixel frequencies from simulations:} Prototype
+  implemented, may need reviewing / updating.
+\item \textit{Pre-process empirical images:} Done (partially?)
+\item \textit{Devise pixel frequency profile data structure suitable
+    for empirical and simulated data:} Prototype was working but is
+  now defunct due to changes. Review ``\texttt{cdata}'' for
+  suitability.
+\end{itemize}
+
+
+\appendix
+
+\section{Models}
+
+\subsection{\texttt{wheat105.trl}}
+
+\begin{footnotesize}
+\verbatimtabinput{wheat105.trl}
+\end{footnotesize}
+
+
+\section{Analysis Code}
+
+\subsection{\texttt{senescence\_imageanalysis.R}}
+
+\begin{footnotesize}
+\verbatimtabinput{senescence_imageanalysis.R}
+\end{footnotesize}
+
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
