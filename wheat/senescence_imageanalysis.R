@@ -171,6 +171,7 @@ pfs2cdata <- function(pfs, maxIntensity)
   intensityList <- colnames(pfs);
   for (dstep in rownames(pfs))
   {
+    message(dstep);
     d <- data.frame(idtag = rep("dummyId", length(intensityList)), intensity = intensityList, time = rep(dstep, length(intensityList)), value = as.numeric(pfs[dstep, ]));
     if (is.null(cdata))
     {
@@ -228,17 +229,25 @@ doodle2cdata <- function(doodleFile)
 }
 
 
+extractTimestep <- function(lsysPnmFnameList)
+{
+  
+}
+
+
 readLsysCdata <- function(lsysBasename, colormapFname)
 {
   # FIXME: hardcoded fnamePattern
-  fnamePattern <- sprintf("%s_d.+\\.ppm", lsysBasename);
+  fnamePatternPrefix <- sprintf("%s_d", lsysBasename);
+  fnamePattern <- sprintf("%s.+\\.ppm", fnamePatternPrefix);
   # print(fnamePattern);
   fnameList <- dir(pattern = fnamePattern);
   lsysPfs <- readPixelFreqSeries(fnameList, colormapFname);
   lsysCdata <- pfs2cdata(lsysPfs, 4);
   ## FIXME: position of time step determined by crude positional hack
   timestepStrPos <- nchar(lsysBasename) + 3;
-  lsysCdata$time <- as.factor(sprintf("t%s", substring(as.character(lsysCdata$time), timestepStrPos, timestepStrPos)));
+  timeStepStr <- substring(as.character(lsysCdata$time), nchar(fnamePatternPrefix) + 1, nchar(fnameList) - 4);
+  lsysCdata$time <- as.factor(sprintf("t%s", timeStepStr));
   return(lsysCdata);
 }
 
