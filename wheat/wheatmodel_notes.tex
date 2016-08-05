@@ -89,6 +89,23 @@ implemented
 
 \appendix
 
+\section{Data Structures and Fie Formats}
+
+\subsection{``Doodle'' Format}
+
+\begin{itemize}
+\item One row per plant and time point
+\item Columns plant \texttt{idtag}, \texttt{timestamp}, and 128
+  colours
+\item Colour descriptors (RGB or similar) not contained in file
+  \todo{where are they?}
+\end{itemize}
+
+
+\subsection{``cdata'' Structure}
+
+
+
 \section{Models}
 
 \subsection{\texttt{wheat105.trl}}
@@ -106,6 +123,14 @@ implemented
 \verbatimtabinput{senescence_imageanalysis.R}
 \end{footnotesize}
 
+
+\section{Files / Formats}
+
+\begin{itemize}
+\item \texttt{contable.csv}: index (column \texttt{i}) to RGB (columns
+  \texttt{R}, \texttt{B}, \texttt{B}) mapping table. Appears
+  computable (?)
+\end{itemize}
 
 \end{document}
 
