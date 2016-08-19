@@ -187,9 +187,28 @@ pfs2cdata <- function(pfs, maxIntensity)
 }
 
 
+doodleTimeToJulian <- function(s, startDay)
+{
+  daysPerMonth <- c(31L, 28L, 31L, 30L, 31L, 30L, 31L, 31L, 30L, 31L, 30L, 31L);
+  if (!all(substring(s, 2, 5) == "2015"))
+  {
+    stop("function currently works for 2015 only");
+  }
+  m <- as.integer(substring(s, 7, 8));
+  d <- as.integer(substring(s, 10, 11));
+  j <- d;
+  for (i in seq(along = daysPerMonth))
+  {
+    b <- m > i;
+    j[b] <- j[b] + daysPerMonth[i];
+  }
+  return(j - startDay);
+}
+    
+
 doodle2cdata <- function(doodleFile)
 {
-  doodle <- read.table(doodleFile, header = TRUE, sep = ",");
+  doodle <- read.table(doodleFile, header = TRUE, sep = "\t");
   freqs <- colnames(doodle)[3:dim(doodle)[2]];
   freqs <- as.numeric(sub("X", "", freqs));
   colnames(doodle)[3:dim(doodle)[2]] <- freqs;
