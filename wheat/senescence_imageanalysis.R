@@ -204,18 +204,22 @@ doodleTimeToJulian <- function(s, startDay)
   }
   return(j - startDay);
 }
-    
 
-doodle2cdata <- function(doodleFile)
+
+readDoodle <- function(doodleFname)
 {
-  doodle <- read.table(doodleFile, header = TRUE, sep = "\t");
+  return(read.csv(doodleFname, header = TRUE));
+}
+
+
+doodle2cdata <- function(doodle, idtagName)
+{
+  warning("obsolete function -- use doodleToCdata");
   freqs <- colnames(doodle)[3:dim(doodle)[2]];
   freqs <- as.numeric(sub("X", "", freqs));
   colnames(doodle)[3:dim(doodle)[2]] <- freqs;
-  ## subset
-  ## jtk: idtagname should probably be a parameter
-  idtagname <- "W8-114112";
-  ix <- which(doodle$idtag == idtagname);
+  ## idtagname <- "W8-114112";
+  ix <- which(doodle$idtag == idtagName);
   scsub <- doodle[ix,];
   ## 
   it <- read.table("contable.csv", header = TRUE, sep = ",");
@@ -248,9 +252,76 @@ doodle2cdata <- function(doodleFile)
 }
 
 
-extractTimestep <- function(lsysPnmFnameList)
+makeHexPalette <- function(rgbLevelList)
 {
-  
+  rgbTable <- expand.grid(b = rgbLevelList, g = rgbLevelList, r = rgbLevelList);
+  return(data.frame(i = 0:nrow(rgbTable), rgb = sprintf("#%02X%02X%02X", rgbTable$r, rgbTable$g, rgbTable$b)));
+}
+
+
+readContablePalette <- function(contableName)
+{
+  contable <- read.csv(contableName);
+  return(data.frame(i = contable$i, rgb = sprintf("#%02X%02X%02X", contable$R, contable$G, contable$B)));
+}
+
+
+doodleToCdata <- function(doodle, palette, idtagName = NULL)
+{
+  colorIndexDoodle <- as.integer(substring(colnames(doodle)[3:ncol(doodle)], 2L));
+  colorIndex <- integer();
+  colorList <- character();
+  for (i in seq(along = colorIndexDoodle))
+  {
+    b <- palette$i == colorIndexDoodle[i];
+    if (sum(b) == 0L)
+    {
+      warning(sprintf("no rgb color for palette index %d", colorIndexDoodle[i]));
+    }
+    else if (sum(b) > 1L)
+    {
+      stop(sprintf("found %d palette rows with i = %d", sum(b), colorIndexDoodle[i]));
+    }
+    else
+    {
+      colorList <- c(colorList, as.character(palette$rgb[i]));
+      colorIndex <- c(colorIndex, i);
+    }
+  }
+  numColors <- length(colorIndex);
+  if (is.null(idtagName))
+  {
+    doodleSub <- doodle;
+  }
+  else
+  {
+    doodleSub <- doodle[doodle$idtag == idtagName, ];
+  }
+  idtagList <- character();
+  intensityList <- character();
+  timeList <- character();
+  valueList <- integer();
+  for (i in 1L:nrow(doodleSub))
+  {
+    valueList <- c(valueList, as.numeric(doodleSub[i, colorIndex]));
+    idtagList <- c(idtagList, rep(as.character(doodleSub$idtag[i]), numColors));
+    timeList <- c(timeList, rep(as.character(doodleSub$time[i]), numColors));
+    intensityList <- c(intensityList, colorList);
+    ## message(sprintf("lengths: valueList: %d, idtagList: %d, timeList: %d,intensityList: %d", length(valueList), length(idtagList), length(timeList), length(intensityList)));
+  }
+  return(data.frame(idtag = idtagList, intensity = intensityList, time = timeList, value = valueList, stringsAsFactors = FALSE));
+}
+
+
+doodleCdataList <- function(doodle)
+{
+  l <- list();
+  for (idtagName in as.character(doodle$idtag))
+  {
+    message(idtagName);
+    l[[idtagName]] <- doodle2cdata(doodle, idtagName);
+  }
+  return(l);
 }
 
 
