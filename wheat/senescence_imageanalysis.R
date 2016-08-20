@@ -1,6 +1,6 @@
 library("ggplot2");
 ## FIXME: what do we need gdata for?
-library("gdata");
+#library("gdata");
 
 
 readEmpirical <- function(fname, cutoff)
@@ -467,13 +467,11 @@ get_subdata <- function(data, conver_table, intens)
   scc1 <- data.frame(idtag = copydata$idtag, 
                    time = copydata$time, copydata[ ,u]); # Create frame with sel intensi
   ## FIXME: dim(scc1)[2] looks like equivalent to ncol to me
-  freq <- colnames(scc1)[3:dim(scc1)[2]];
+  freq <- colnames(scc1)[3:ncol(scc1)];
   freq <- as.numeric(sub("X", "", freq));
-  colnames(scc1)[3:dim(scc1)[2]] <- freq; # Delete X in columns
-  #write.table(scc1, file='t.csv', sep=',', row.names=F);
-  
-  mm <- as.matrix(scc1[, 3:dim(scc1)[2]]); # Deletes -4
-  vector_data <- unmatrix(mm,byrow=T); # Convert matrix into vector
+  colnames(scc1)[3:ncol(scc1)] <- freq; # Delete X in columns
+  mm <- as.matrix(scc1[, 3:ncol(scc1)]); # Deletes -4
+  vector_data <- unmatrix(mm, byrow=T); # Convert matrix into vector
   vector_data <- as.numeric(vector_data); # Convert values to numeric
   idtag <- as.character(unique(scc1$idtag)); # Unique idtags
   time <- as.character(unique(scc1$time)) # unique time points
@@ -485,16 +483,15 @@ get_subdata <- function(data, conver_table, intens)
 
 
 ## FIXME: what are data1, data2?
-convert2hex <- function(data1, data2)
+convert2hex <- function(freq_list, colormap)
 {
-  copydata1 <- data1;
-  copydata2 <- data2;
+  copydata1 <- freq_list;
+  copydata2 <- colormap;
   hexlist <- c();
   
-  for(i in 1:length(copydata1))
+  for(i in copydata1)
   {
-    idx <- which(copydata2$i == copydata1[i])
-    hexlist <- append(hexlist, as.character(copydata2[idx, 5]));
+    hexlist <- append(hexlist, as.character(copydata2[i, 'hex']));
   }
   return(hexlist)
 }
@@ -510,11 +507,28 @@ print_plot <- function(data, tname)
   print(p);
 }
 
+convert2col = function(data)
+{
+  
+  v = as.numeric(data);
+  m = max(v);
+  if(max(v) == 0)
+  {
+    m = 1;
+  }
+  return(rgb(v[1], v[2], v[3],  maxColorValue=m));
+  
+}
 
 plotDoodle <- function()
 {
-  it <- read.table("contable.csv", header = TRUE, sep = ",");
-  it <- data.frame(it, hex = rgb(it[ ,2:4], max = 255));
+  system('make');
+  colormap <- read.table("rgb5colormap.ppm", header = FALSE, sep = " ", skip=2);
+  colormap <- data.frame(colormap, 
+                         hex = sapply(rownames(colormap), 
+                                    function(x) convert2col(colormap[x,1:3])));
+         
+                         
   ## Select intensities
   intens = c(1, 4, 5, 16, 20, 21, 24, 25, 26, 27, 30, 31, 32, 50, 54, 55, 60, 108, 112, 116);
   filename <- "doodle.csv";
@@ -523,7 +537,9 @@ plotDoodle <- function()
   colnames(avgData) <- c("idtag", "time", as.character(1:(ncol(avgData)-2)));
   avgData <- convert2numeric(avgData, colnames(avgData)[3:(ncol(avgData)-2)]);
   avgData <- calibratedata(avgData);
-  cdatacal <- get_subdata(avgData, it, intens);
+  cdatacal <- get_subdata(avgData, colormap, intens);
   print_plot(cdatacal, "average");
   write.table(avgData, file = "avgData.csv", sep = ",", quote = FALSE, row.names = FALSE)
 }
+
+plotDoodle()
