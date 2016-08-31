@@ -1,6 +1,6 @@
 library("ggplot2");
 ## FIXME: what do we need gdata for?
-#library("gdata");
+library("gdata");
 
 
 readEmpirical <- function(fname, cutoff)
@@ -516,8 +516,20 @@ convert2col = function(data)
   {
     m = 1;
   }
-  return(rgb(v[1], v[2], v[3],  maxColorValue=m));
-  
+  #return(rgb(v[1], v[2], v[3],  maxColorValue=m));
+  return(rgb(v[1], v[2], v[3]));
+}
+
+# Convert hexa to RGB
+convert2RGB = function(data)
+{
+  t = c();
+  for(frehex in data)
+  {
+    t = rbind(t, col2rgb(frehex)[1:3]);
+  }
+  colnames(t) = c('R', 'G', 'B')
+  return(t);
 }
 
 plotDoodle <- function()
@@ -526,10 +538,21 @@ plotDoodle <- function()
   colormap <- read.table("rgb5colormap.ppm", header = FALSE, sep = " ", skip=2);
   colormap <- data.frame(colormap, 
                          hex = sapply(rownames(colormap), 
-                                    function(x) convert2col(colormap[x,1:3])));
-         
+                                      function(x) convert2col(colormap_matlab[x,1:3])));
+  
+  colormap_Matlab = read.table('matpab_map_128.csv', header=F, sep=',');
+  
+  
+  colormap_Matlab <- data.frame(colormap_Matlab, 
+                         hex = sapply(rownames(colormap_Matlab), 
+                                      function(x) convert2col(colormap_Matlab[x,1:3])));
+  
+  # Convert hexa to rgb and export file
+  write.table(merge(colormap_Matlab, convert2RGB(colormap_Matlab$hex), by.x='row.names', by.y='row.names'), 
+              file='map.csv', sep=',');
+  
                          
-  ## Select intensities
+  ## Select intensities to avoid getting black and blue from background
   intens = c(1, 4, 5, 16, 20, 21, 24, 25, 26, 27, 30, 31, 32, 50, 54, 55, 60, 108, 112, 116);
   filename <- "doodle.csv";
   avgData <- transformData(filename);
@@ -537,9 +560,9 @@ plotDoodle <- function()
   colnames(avgData) <- c("idtag", "time", as.character(1:(ncol(avgData)-2)));
   avgData <- convert2numeric(avgData, colnames(avgData)[3:(ncol(avgData)-2)]);
   avgData <- calibratedata(avgData);
-  cdatacal <- get_subdata(avgData, colormap, intens);
+  cdatacal <- get_subdata(avgData, colormap_Matlab, intens);
   print_plot(cdatacal, "average");
   write.table(avgData, file = "avgData.csv", sep = ",", quote = FALSE, row.names = FALSE)
 }
 
-plotDoodle()
+#plotDoodle()
