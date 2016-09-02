@@ -1,5 +1,6 @@
 library("ggplot2");
 ## FIXME: what do we need gdata for?
+## can't we get rid of this? and of ggplot2 as well, preferably?
 library("gdata");
 
 
@@ -564,5 +565,27 @@ plotDoodle <- function()
   print_plot(cdatacal, "average");
   write.table(avgData, file = "avgData.csv", sep = ",", quote = FALSE, row.names = FALSE)
 }
+
+
+## example usage: csvToPpm("matpab_map_128.csv", "matpab_map_128.ppm");
+csvToPpm <- function(csvFilename, ppmFilename)
+{
+  continuousTo8bit <- function(x)
+  {
+    x8 <- as.integer(x * 256.0);
+    x8[x8 > 255L] <- 255L;
+    return(x8);
+  }
+  d <- read.csv(csvFilename, header = FALSE);
+  if (ncol(d) != 3)
+  {
+    stop("csv needs to be in exactly 3 columns, r, g and b");
+  }
+  r <- continuousTo8bit(d[[1]]);
+  g <- continuousTo8bit(d[[2]]);
+  b <- continuousTo8bit(d[[3]]);
+  write(c("P3", sprintf("%d 1 255", nrow(d)), sprintf("%d %d %d", r, g, b)), file = ppmFilename);
+}
+
 
 #plotDoodle()
