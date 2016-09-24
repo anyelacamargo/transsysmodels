@@ -13,7 +13,7 @@ class PpmPixel(object) :
     
     
   def __str__(self) :
-    return 'rgb%x%x%x' % (self.r, self.g, self.b)
+    return 'pix%02x%02x%02x' % (self.r, self.g, self.b)
   
 
 class PpmStream(object) :
@@ -46,8 +46,13 @@ class PpmStream(object) :
     b = self.nextInt()
     return PpmPixel(r, g, b)
     
+    
+  def close(self) :
+    self.f.close()
+    self.f = None
+    
 
-def makeColorFreqDict(f) :
+def makeColorFreqDict(f, colorList = None) :
   s = PpmStream(f)
   if s.nextValue() != 'P3' :
     raise StandardError, 'input is not a ppm (use pnmnoraw?)'
@@ -57,35 +62,61 @@ def makeColorFreqDict(f) :
   # if maxIntensity != 3 :
   #   raise StandardError, 'can currently only deal with max. intensity of 3'
   colorFreqDict = {}
-  for r in xrange(maxIntensity + 1) :
-    for g in xrange(maxIntensity + 1) :
-      for b in xrange(maxIntensity + 1) :
-        p = PpmPixel(r, g, b)
-        colorName = str(p)
-        colorFreqDict[colorName] = 0
+  if colorList is None :
+    for r in xrange(maxIntensity + 1) :
+      for g in xrange(maxIntensity + 1) :
+        for b in xrange(maxIntensity + 1) :
+          p = PpmPixel(r, g, b)
+          colorName = str(p)
+          colorFreqDict[colorName] = 0
+  else :
+    for p in colorList :
+      colorName = str(p)
+      colorFreqDict[colorName] = 0
   for y in xrange(height) :
     for x in xrange(width) :
       p = s.nextPixel()
       colorName = str(p)
       colorFreqDict[colorName] = colorFreqDict[colorName] + 1
+  s.close()
   return colorFreqDict
 
 
-def pnmstats(infile, outfile) :
-  colorFreqDict = makeColorFreqDict(infile)
+def readColormap(ppmFname) :
+  f = open(ppmFname, 'r')
+  s = PpmStream(f)
+  if s.nextValue() != 'P3' :
+    raise StandardError, 'input is not a ppm (use pnmnoraw?)'
+  width = s.nextInt()
+  height = s.nextInt()
+  maxIntensity = s.nextInt()
+  colorList = []
+  for y in xrange(height) :
+    for x in xrange(width) :
+      colorList.append(s.nextPixel())
+      # sys.stderr.write("added color %s\n" % str(colorList[-1]))
+  s.close()
+  return colorList
+  
+
+def pnmstats(infile, outfile, colorList = None) :
+  colorFreqDict = makeColorFreqDict(infile, colorList)
   colorNameList = colorFreqDict.keys()
   colorNameList.sort()
   outfile.write('numPixels\n')
   for colorName in colorNameList :
     outfile.write('%s\t%s\n' % (colorName, colorFreqDict[colorName]))
 
-    
-options, args = getopt.getopt(sys.argv[1:], 'h')
+
+colorList = None
+options, args = getopt.getopt(sys.argv[1:], 'm:h')
 for opt, par in options :
   if opt == '-h' :
     print 'options:'
     print '-h: print this help and exit'
     sys.exit()
+  elif opt == '-m' :
+    colorList = readColormap(par)
   else :
     raise StandardError, 'unhandled option "%s"' % opt
 if len(args) > 0 :
@@ -96,4 +127,4 @@ if len(args) > 1 :
   outfile = open(args[1], 'w')
 else :
   outfile = sys.stdout
-pnmstats(infile, outfile)
+pnmstats(infile, outfile, colorList)

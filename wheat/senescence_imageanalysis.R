@@ -61,8 +61,8 @@ readPixelFreqSeries <- function(fnameList, colormapFname)
   a <- NULL;
   for (fname in fnameList)
   {
-    cmd <- sprintf("pnmremap -mapfile=\'%s\' %s | pnmnoraw | ./pixelcount", colormapFname, fname);
-    print(cmd);
+    cmd <- sprintf("pnmremap -mapfile=\'%s\' %s | pnmnoraw | ./pixelcount -m %s", colormapFname, fname, colormapFname);
+    message(cmd);
     d <- read.table(pipe(cmd), header = TRUE, sep = "\t");
     d1 <- t(d);
     if (is.null(a))
@@ -81,6 +81,7 @@ readPixelFreqSeries <- function(fnameList, colormapFname)
 }
 
 
+### deprecated
 rgb2hex <- function(maxIntensity, rgb)
 {
   ## FIXME: should check for 'rgb' prefix or similar...?
@@ -93,7 +94,7 @@ rgb2hex <- function(maxIntensity, rgb)
   r[r > 255L] <- 255L;
   g[g > 255L] <- 255L;
   b[b > 255L] <- 255L;
-  return(sprintf("#%02X%02X%02X", r, g, b));
+  return(sprintf("#%02x%02x%02x", r, g, b));
 }
 
 
@@ -166,6 +167,7 @@ allProfileCorrelationDistance <- function(a1, a2)
 }
 
 
+### deprecated
 pfs2cdata <- function(pfs, maxIntensity)
 {
   cdata <- NULL;
@@ -188,8 +190,84 @@ pfs2cdata <- function(pfs, maxIntensity)
 }
 
 
-doodleTimeToJulian <- function(s, startDay)
+## map continuous values in [0.0, 1.0] to discrete values in [0, 255]
+## this implementation seems "consistent" in the sense that applying it to
+## matpab_map_128.csv results in the colours found in seg.png
+## Notice that a few colours in contable.csv are off by one
+continuousTo8bit <- function(x)
 {
+  x8 <- as.integer(x * 256.0);
+  x8[x8 > 255L] <- 255L;
+  return(x8);
+}
+
+
+readCsvColormap <- function(csvFilename)
+{
+  return(read.csv(csvFilename, header = FALSE, stringsAsFactors = FALSE));
+}
+
+
+readRgbCsvPalette <- function(rgbCsvFname)
+{
+  d <- readCsvColormap(rgbCsvFname);
+  if (ncol(d) != 3)
+  {
+    stop("csv needs to be in exactly 3 columns for r, g and b");
+  }
+  r <- continuousTo8bit(d[[1]]);
+  g <- continuousTo8bit(d[[2]]);
+  b <- continuousTo8bit(d[[3]]);
+  return(data.frame(i = seq(along = r), hexcol = sprintf("#%02x%02x%02x", r, g, b)));
+}
+
+
+readContablePalette <- function(contableName)
+{
+  contable <- read.csv(contableName, stringsAsFactors = FALSE);
+  return(data.frame(i = contable$i, hexcol = sprintf("#%02x%02x%02x", contable$R, contable$G, contable$B), stringsAsFactors = FALSE));
+}
+
+
+pixcolToHexcol <- function(pixcol)
+{
+  if (!all(substring(pixcol, 1, 3) == "pix"))
+  {
+    stop("pixcol contains strings not starting with \"pix\"");
+  }
+  return(sub("pix", "#", pixcol));
+}
+
+
+hexcolToPixcol <- function(hexcol)
+{
+  if (!all(grepl("#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]", hexcol)))
+  {
+    stop("hexcol contains invalid strings");
+  }
+  return(sprintf("pix%s", substring(hexcol, 2, 7)));
+}
+
+
+isPixColumnHeader <- function(columnHeader)
+{
+  return(substring(columnHeader, 1L, 3L) == "pix");
+}
+
+
+findPixcolList <- function(d)
+{
+  h <- colnames(d);
+  return(h[isPixColumnHeader(h)]);
+}
+
+
+doodleTimeToJulian <- function(s, startDay = 0)
+{
+  if (is.null(s))
+  {
+    stop("null date string");
+  }
   daysPerMonth <- c(31L, 28L, 31L, 30L, 31L, 30L, 31L, 31L, 30L, 31L, 30L, 31L);
   if (!all(substring(s, 2, 5) == "2015"))
   {
@@ -207,12 +285,114 @@ doodleTimeToJulian <- function(s, startDay)
 }
 
 
-readDoodle <- function(doodleFname)
+readDoodle <- function(doodleFname, rgbCsvFname, startDay)
 {
-  return(read.csv(doodleFname, header = TRUE));
+  d <- read.csv(doodleFname, header = TRUE, stringsAsFactors = FALSE);
+  contable <- readRgbCsvPalette(rgbCsvFname);
+  nColoursContable <- nrow(contable);
+  nColoursDoodle <- ncol(d) - 2L;
+  if (nColoursDoodle > nColoursContable)
+  {
+    warning(sprintf("truncating %d columns", nColoursDoodle - nColoursContable));
+    d <- d[, 1:(ncol(d) + nColoursContable - nColoursDoodle)];
+  }
+  colnames(d)[3L:ncol(d)] <- hexcolToPixcol(contable$hexcol);
+  j <- 
+  d1 <- d[, 1:2];
+  d1[["timepoint"]] <- doodleTimeToJulian(d$timestamp, startDay);
+  d <- cbind(d1, d[, 3:ncol(d)]);
+  return(d);
 }
 
 
+singlePlantDoodle <- function(d, idtag)
+{
+  return(d[d$idtag == idtag, ]);
+}
+
+
+isTimepointUnique <- function(d)
+{
+  return(length(unique(d$timepoint)) == nrow(d));
+}
+
+
+doodleCorrelationDivergence <- function(d1, d2)
+{
+  if (nrow(d1) != nrow(d2))
+  {
+    stop("incompatible doodle sets (length differ)");
+  }
+  if (!isTimepointUnique(d1))
+  {
+    stop("timepoint values in d1 not unique");
+  }
+  if (!isTimepointUnique(d2))
+  {
+    stop("timepoint values in d2 not unique");
+  }
+  pixList1 <- findPixcolList(d1);
+  pixList2 <- findPixcolList(d2);
+  if ((length(pixList1) != length(pixList2)) || (length(intersect(pixList1, pixList2)) != length(pixList1)))
+  {
+    stop("incompatible pixel colour lists");
+  }
+  if (!all(d1$timepoint == d2$timepoint))
+  {
+    stop("incompatible timepoint sets");
+  }
+  d1pix <- d1[, pixList1];
+  d2pix <- d2[, pixList1];
+  dcd <- 0.0;
+  for (pix in pixList1)
+  {
+    x <- as.numeric(d1pix[[pix]]);
+    y <- as.numeric(d2pix[[pix]]);
+    if ((var(x) == 0.0) || (var(y) == 0.0))
+    {
+      if ((var(x) == 0.0) && (var(y) == 0.0))
+      {
+        dcd <- dcd + 0.0;
+      }
+      else
+      {
+        dcd <- dcd + 1.0;
+      }
+    }
+    else
+    {
+      dcd <- dcd + 1.0 - cor(x, y);
+    }
+  }
+  return(dcd);
+}
+
+
+doodleTimepointIntersection <- function(d1, d2)
+{
+  t1 <- d1$timepoint;
+  t2 <- d2$timepoint;
+  b <- t1 %in% t2;
+  return(d1[b, ]);
+}
+
+
+plotPixcolPalette <- function(pixcol)
+{
+  cols <- pixcolToHexcol(pixcol);
+  nRows <- floor(sqrt(length(cols))) + 1;
+  nCols <- ceiling(length(cols) / nRows);
+  message(sprintf("nRows = %f, nCols = %f", nRows, nCols));
+  xy <- expand.grid(1:nCols, 1:nRows);
+  i <- seq(along = pixcol);
+  x <- xy[[1]][i];
+  y <- xy[[2]][i];
+  plot(x, y, col = cols);
+  text(x, y, pixcol, pos = 4);
+}
+
+
+### deprecated
 doodle2cdata <- function(doodle, idtagName)
 {
   warning("obsolete function -- use doodleToCdata");
@@ -256,17 +436,11 @@ doodle2cdata <- function(doodle, idtagName)
 makeHexPalette <- function(rgbLevelList)
 {
   rgbTable <- expand.grid(b = rgbLevelList, g = rgbLevelList, r = rgbLevelList);
-  return(data.frame(i = 0:nrow(rgbTable), rgb = sprintf("#%02X%02X%02X", rgbTable$r, rgbTable$g, rgbTable$b)));
+  return(data.frame(i = 0:nrow(rgbTable), hexcol = sprintf("#%02x%02x%02x", rgbTable$r, rgbTable$g, rgbTable$b)));
 }
 
 
-readContablePalette <- function(contableName)
-{
-  contable <- read.csv(contableName);
-  return(data.frame(i = contable$i, rgb = sprintf("#%02X%02X%02X", contable$R, contable$G, contable$B)));
-}
-
-
+### deprecated
 doodleToCdata <- function(doodle, palette, idtagName = NULL)
 {
   colorIndexDoodle <- as.integer(substring(colnames(doodle)[3:ncol(doodle)], 2L));
@@ -326,6 +500,22 @@ doodleCdataList <- function(doodle)
 }
 
 
+
+readLsysDoodle <- function(lsysBasename, colormapFname)
+{
+  fnamePatternPrefix <- sprintf("%s_d", lsysBasename);
+  fnamePattern <- sprintf("%s[0-9]+\\.ppm", fnamePatternPrefix);
+  # print(fnamePattern);
+  fnameList <- dir(pattern = fnamePattern);
+  ## FIXME: hard-coded to assume 3 digit timestamps
+  timepointList <- as.integer(substring(fnameList, nchar(fnamePatternPrefix) + 1L, nchar(fnamePatternPrefix) + 3L));
+  lsysPfs <- readPixelFreqSeries(fnameList, colormapFname);
+  lsysDoodle <- cbind(data.frame(filename = rownames(lsysPfs), idtag = lsysBasename, timepoint = timepointList), lsysPfs);
+  return(lsysDoodle);
+}
+
+
+### deprecated
 readLsysCdata <- function(lsysBasename, colormapFname)
 {
   # FIXME: hardcoded fnamePattern
@@ -508,7 +698,9 @@ print_plot <- function(data, tname)
   print(p);
 }
 
-convert2col = function(data)
+
+### deprecated (can use standard rgb() function directly)
+convert2col <- function(data)
 {
   
   v = as.numeric(data);
@@ -521,18 +713,22 @@ convert2col = function(data)
   return(rgb(v[1], v[2], v[3]));
 }
 
+
+### deprecated
 # Convert hexa to RGB
-convert2RGB = function(data)
+convert2RGB <- function(data)
 {
-  t = c();
+  t <- c();
   for(frehex in data)
   {
-    t = rbind(t, col2rgb(frehex)[1:3]);
+    t <- rbind(t, col2rgb(frehex)[1:3]);
   }
-  colnames(t) = c('R', 'G', 'B')
+  colnames(t) <- c('R', 'G', 'B')
   return(t);
 }
 
+
+### deprecated
 plotDoodle <- function()
 {
   system('make');
@@ -567,16 +763,16 @@ plotDoodle <- function()
 }
 
 
+findColors <- function(colormap, colorIndexList)
+{
+  return(colormap[colorIndexList, ]);
+}
+
+
 ## example usage: csvToPpm("matpab_map_128.csv", "matpab_map_128.ppm");
 csvToPpm <- function(csvFilename, ppmFilename)
 {
-  continuousTo8bit <- function(x)
-  {
-    x8 <- as.integer(x * 256.0);
-    x8[x8 > 255L] <- 255L;
-    return(x8);
-  }
-  d <- read.csv(csvFilename, header = FALSE);
+  d <- readCsvColormap(csvFilename);
   if (ncol(d) != 3)
   {
     stop("csv needs to be in exactly 3 columns, r, g and b");
