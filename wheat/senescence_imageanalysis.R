@@ -368,10 +368,18 @@ doodleCorrelationDivergence <- function(d1, d2)
 }
 
 
-doodleTimepointIntersection <- function(d1, d2)
+doodleTimepointProjection <- function(d1, d2)
 {
   t1 <- d1$timepoint;
   t2 <- d2$timepoint;
+  if (any(!(t2 %in% t1)))
+  {
+    print(t1);
+    print(t2);
+    print(!(t2 %in% t1));
+    print(t2[!(t2 %in% t1)]);
+    stop("timepoints in d2 are not a subset of timepoints in d1");
+  }
   b <- t1 %in% t2;
   return(d1[b, ]);
 }
@@ -391,6 +399,67 @@ plotPixcolPalette <- function(pixcol)
   text(x, y, pixcol, pos = 4);
 }
 
+
+makeTimepointCoverageTable <- function(doodle)
+{
+  timepointList <- sort(unique(doodle$timepoint));
+  n <- rep(0L, length(timepointList));
+  for (idtag in unique(doodle$idtag))
+  {
+    singlePlantTimepointList <- unique(singlePlantDoodle(doodle, idtag)$timepoint);
+    n <- n + as.integer(timepointList %in% singlePlantTimepointList);
+  }
+  return(data.frame(timepoint = timepointList, numPlants = n));
+}
+
+
+makeNumTimepointTable <- function(doodle)
+{
+  idtagList <- unique(doodle$idtag);
+  return(data.frame(numTimepoints = sapply(idtagList, function(idtag) { nrow(singlePlantDoodle(doodle, idtag)); })));
+}
+
+
+makeSinglePlantProjectionList <- function(doodle, refIdtag)
+{
+  refDoodle <- singlePlantDoodle(doodle, refIdtag);
+  sppList <- list();
+  for (idtag in unique(doodle$idtag))
+  {
+    s <- singlePlantDoodle(doodle, idtag);
+    if (all(refDoodle$timepoint %in% s$timepoint))
+    {
+      sppList[[idtag]] <- doodleTimepointProjection(s, refDoodle);
+    }
+  }
+  return(sppList);
+}
+
+
+correlationDivergenceMatrix <- function(doodleList)
+{
+  numPlants <- length(doodleList);
+  m <- matrix(as.numeric(NA), nrow = numPlants, ncol = numPlants);
+  rownames(m) <- names(doodleList);
+  colnames(m) <- names(doodleList);
+  for (idtag1 in names(doodleList))
+  {
+    for (idtag2 in names(doodleList))
+    {
+      m[idtag1, idtag2] <- doodleCorrelationDivergence(doodleList[[idtag1]], doodleList[[idtag2]]);
+    }
+  }
+  return(m);
+}
+
+
+cdmDemo <- function()
+{
+  doodle <- readDoodle("doodle.csv", "matpab_map_128.csv", -9L);
+  sppList <- makeSinglePlantProjectionList(d, "W8-001111");
+  plot(hclust(as.dist(cdm)));
+  return(invisible(list(doodle = doodle, sppList = sppList)));
+}
 
 ### deprecated
 doodle2cdata <- function(doodle, idtagName)
