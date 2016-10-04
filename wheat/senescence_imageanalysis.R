@@ -457,6 +457,7 @@ cdmDemo <- function()
 {
   doodle <- readDoodle("doodle.csv", "matpab_map_128.csv", -9L);
   sppList <- makeSinglePlantProjectionList(doodle, "W8-001111");
+  cdm <- correlationDivergenceMatrix(sppList);
   plot(hclust(as.dist(cdm)));
   return(invisible(list(doodle = doodle, sppList = sppList)));
 }
