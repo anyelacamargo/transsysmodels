@@ -502,14 +502,19 @@ correlationDivergenceMatrix <- function(doodleList)
 
 cdmDemo <- function()
 {
+  refIdtag <- "W8-001111";
   doodle <- readDoodle("doodle.csv", "matpab_map_128.csv", -9L);
-  sppList <- makeSinglePlantProjectionList(doodle, "W8-001111");
+  sppList <- makeSinglePlantProjectionList(doodle, refIdtag);
   cdm <- correlationDivergenceMatrix(sppList);
   plot(hclust(as.dist(cdm)));
   ## I us want to use the same intensities # Vey crude way but it seems they're the most relevants.
   ## indices on "intens" variable
   pixcolList <- findPixcolList(doodle)[c(1L, 4L, 5L, 16L, 20L, 21L, 24L, 25L, 26L, 27L, 30L, 31L, 32L, 50L, 54L, 55L, 60L, 108L, 112L, 116L)];
-  return(invisible(list(doodle = doodle, sppList = sppList, pixcolList = pixcolList)));  
+  dReduced <- reducePixcols(doodle, pixcolList);
+  sppListReduced <- makeSinglePlantProjectionList(dReduced, refIdtag);
+  cdmReduced <- correlationDivergenceMatrix(sppListReduced);
+  plot(hclust(as.dist(cdmReduced)));
+  return(invisible(list(doodle = doodle, sppList = sppList, cdm = cdm, pixcolList = pixcolList, dReduced = dReduced, sppListReduced = sppListReduced, cdmReduced = cdmReduced)));  
 }
 
 ### deprecated
