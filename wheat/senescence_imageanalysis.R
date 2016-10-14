@@ -18,8 +18,10 @@ readEmpirical <- function(fname, cutoff)
 }
 
 
+## deprecated
 cumulativePlot <- function(d)
 {
+  warning("deprecated -- use cumulativePixcolFrequencyPlot");
   l <- list();
   for (i in 3:ncol(d))
   {
@@ -262,6 +264,51 @@ findPixcolList <- function(d)
 }
 
 
+cumulativePixcolFrequencyPlot <- function(d)
+{
+  pixcolList <- findPixcolList(d);
+  if (length(pixcolList) == 0L)
+  {
+    stop("no pixel colour columns found");
+  }
+  cumPixcolFreqList <- list();
+  for (pixcol in pixcolList)
+  {
+    if (length(cumPixcolFreqList) == 0)
+    {
+      cumPixcolFreqList[[pixcol]] <- d[[pixcol]];
+    }
+    else
+    {
+      cumPixcolFreqList[[pixcol]] <- d[[pixcol]] + cumPixcolFreqList[[length(cumPixcolFreqList)]];
+    }
+  }
+  ## FIXME: replace with timepoint?
+  x <- seq(along = cumPixcolFreqList[[1L]]);
+  firstPlot <- TRUE;
+  for (pixcol in rev(pixcolList))
+  {
+    if (firstPlot)
+    {
+      plot(x, cumPixcolFreqList[[pixcol]], type = "l", col = pixcolToHexcol(pixcol), ylim = c(0, max(cumPixcolFreqList[[pixcol]])));
+      firstPlot <- FALSE;
+    }
+    else
+    {
+      lines(x, cumPixcolFreqList[[pixcol]], col = pixcolToHexcol(pixcol));
+    }
+  }
+  return(invisible(cumPixcolFreqList));
+}
+
+
+reducePixcols <- function(d, pixcolList)
+{
+  h <- colnames(d);
+  b <- !isPixColumnHeader(h) | (h %in% pixcolList);
+  return(d[, b]);
+}
+
 doodleTimeToJulian <- function(s, startDay = 0)
 {
   if (is.null(s))
@@ -395,7 +442,7 @@ plotPixcolPalette <- function(pixcol)
   i <- seq(along = pixcol);
   x <- xy[[1]][i];
   y <- xy[[2]][i];
-  plot(x, y, col = cols);
+  plot(x, y, col = cols, xlim = c(1L, nRows + 1L));
   text(x, y, pixcol, pos = 4);
 }
 
@@ -455,10 +502,19 @@ correlationDivergenceMatrix <- function(doodleList)
 
 cdmDemo <- function()
 {
+  refIdtag <- "W8-001111";
   doodle <- readDoodle("doodle.csv", "matpab_map_128.csv", -9L);
-  sppList <- makeSinglePlantProjectionList(d, "W8-001111");
+  sppList <- makeSinglePlantProjectionList(doodle, refIdtag);
+  cdm <- correlationDivergenceMatrix(sppList);
   plot(hclust(as.dist(cdm)));
-  return(invisible(list(doodle = doodle, sppList = sppList)));
+  ## I us want to use the same intensities # Vey crude way but it seems they're the most relevants.
+  ## indices on "intens" variable
+  pixcolList <- findPixcolList(doodle)[c(1L, 4L, 5L, 16L, 20L, 21L, 24L, 25L, 26L, 27L, 30L, 31L, 32L, 50L, 54L, 55L, 60L, 108L, 112L, 116L)];
+  dReduced <- reducePixcols(doodle, pixcolList);
+  sppListReduced <- makeSinglePlantProjectionList(dReduced, refIdtag);
+  cdmReduced <- correlationDivergenceMatrix(sppListReduced);
+  plot(hclust(as.dist(cdmReduced)));
+  return(invisible(list(doodle = doodle, sppList = sppList, cdm = cdm, pixcolList = pixcolList, dReduced = dReduced, sppListReduced = sppListReduced, cdmReduced = cdmReduced)));  
 }
 
 ### deprecated
