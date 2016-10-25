@@ -140,7 +140,7 @@ convert2numeric = function(data, col_list)
   return(copydata);
 }
 
-
+break();
 doodle = read.table('doodle.csv', header=T, sep=',');
 freqs = colnames(doodle)[3:dim(doodle)[2]];
 freqs = as.numeric(sub("X", "", freqs));
