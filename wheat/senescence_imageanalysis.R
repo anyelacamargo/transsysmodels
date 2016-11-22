@@ -4,6 +4,30 @@ library("ggplot2");
 library("gdata");
 
 
+# Find RIL's parents
+# cname = the ril name MEL..
+# pedrigreetable = pedigree table ('MAGIC_pedigree.csv')
+# return name mother_father
+processPedrigree = function(cname, pedrigreetable)
+{
+  l = list()
+  cname = as.character(cname);
+  
+  s = strsplit(cname, '-')[[1]];
+  lname = paste(s[1], substr(s[2],1,1), sep='-');
+  i = which(lname == pedrigreetable$Gen.0.8.way.F1);
+  if(length(i) > 0)
+  {
+    mother = as.character(pedrigreetable$X4.way.F[i]);
+    father = as.character(pedrigreetable$X4.way.M[i]);
+    return(paste(mother, father, sep='_'));
+  }
+  else
+  {
+    return(cname);
+  }
+}
+
 readEmpirical <- function(fname, cutoff)
 {
   sc <- read.table(fname, header = TRUE, sep=",");
