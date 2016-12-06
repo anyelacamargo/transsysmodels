@@ -4,6 +4,151 @@ library("ggplot2");
 library("gdata");
 
 
+## compute a data frame of nodes in column n, and their distance to
+## the query node n in column distance. 
+ancestorDistanceFrame <- function(n, ancestorTable)
+{
+  nodeList <- n;
+  distanceList <- 0L;
+  foundNode <- TRUE;
+  distance <- 0L;
+  while (foundNode)
+  {
+    foundNode <- FALSE;
+    newNodeList <- nodeList;
+    distance <- distance + 1L;
+    ## message(sprintf("distance iteration: %d", distance));
+    ## message(sprintf("nodeList: %s", paste(nodeList, collapse = ", ")));
+    for (i in 1:nrow(ancestorTable))
+    {
+      n1 <- ancestorTable$child[i];
+      n1Mother <- ancestorTable$mother[i];
+      n1Father <- ancestorTable$father[i];
+      if (n1 %in% nodeList)
+      {
+        ## message(sprintf("  %s: adding %s, %s", n1, n1Mother, n1Father));
+        if (!is.na(n1Mother) && !(n1Mother %in% newNodeList))
+        {
+          ## message(sprintf("  %s: adding mother %s", n1, n1Mother));
+          newNodeList <- c(newNodeList, n1Mother)
+          distanceList <- c(distanceList, distance);
+          foundNode <- TRUE;
+        }
+        if (!is.na(n1Father) && !(n1Father %in% newNodeList))
+        {
+          ## message(sprintf("  %s: adding father %s", n1, n1Father));
+          newNodeList <- c(newNodeList, n1Father)
+          distanceList <- c(distanceList, distance);
+          foundNode <- TRUE;
+        }
+      }
+    }
+    nodeList <- newNodeList;
+  }
+  return(data.frame(node = nodeList, distance = distanceList));
+}
+
+
+## compute lowest common ancestor distance given two ancestor distance
+## frames
+lcaDistanceAf <- function(n1adFrame, n2adFrame)
+{
+  commonAncestorList <- intersect(n1adFrame$node, n2adFrame$node);
+  lcad <- as.integer(NA);
+  for (commonAncestor in commonAncestorList)
+  {
+    ## print(commonAncestor);
+    a <- n1adFrame$distance[which(n1adFrame$node == commonAncestor)] + n2adFrame$distance[which(n2adFrame$node == commonAncestor)];
+    ## print(a);
+    if (is.na(lcad))
+    {
+      lcad <- a;
+    }
+    else
+    {
+      lcad <- min(lcad, a);
+    }
+  }
+  return(lcad);
+}
+
+
+## compute lowest common ancestor distance of n1 and n2, given
+## topology defined by d. NA is returned if n1 and n2 do not share any
+## common ancestor.
+lcaDistance <- function(n1, n2, ancestorTable)
+{
+  adFrameList <- list();
+  n1adFrame <- ancestorDistanceFrame(n1, ancestorTable);
+  n2adFrame <- ancestorDistanceFrame(n2, ancestorTable);
+  return(lcaDistanceAf(n1adFrame, n2adFrame));
+}
+
+
+## compute a matrix of lowest common ancestor distances
+lcaDistanceMatrix <- function(ancestorTable)
+{
+  childList <- unique(c(ancestorTable$child, ancestorTable$mother, ancestorTable$father));
+  childList <- childList[!is.na(childList)];
+  adFrameList <- list();
+  for (child in childList)
+  {
+    adFrameList[[child]] <- ancestorDistanceFrame(child, ancestorTable);
+  }
+  lcadMatrix <- matrix(as.integer(NA), nrow = length(childList), ncol = length(childList));
+  rownames(lcadMatrix) <- childList;
+  colnames(lcadMatrix) <- childList;
+  for (i in 1L:length(childList))
+  {
+    for (j in 1L:i)
+    {
+      lcadMatrix[i, j] <- lcaDistanceAf(adFrameList[[childList[i]]], adFrameList[[childList[j]]]);
+      if (j < i)
+      {
+        lcadMatrix[j, i] <- lcadMatrix[i, j];
+      }
+    }
+  }
+  return(lcadMatrix);
+}
+
+
+magicAncestorTable <- function(pTable)
+{
+  addChild <- function(d, child, father, mother)
+  {
+    message(sprintf("addChild: child = %s, father = %s, mother = %s", child, father, mother));
+    if (sum((d$child == child) & (d$father == father) & (d$mother == mother)) == 0L)
+    {
+      message(sprintf("adding: %s", child));
+      d[nrow(d) + 1L, ] <- c(child, father, mother);
+    }
+    print(d);
+    return(d);
+  }
+
+  addAllChildren <- function(d, childList, fatherList, motherList)
+  {
+    message("addAllChildren");
+    for (i in 1:length(childList))
+    {
+      d <- addChild(d, childList[i], fatherList[i], motherList[i]);
+    }
+    return(d);
+  }
+  
+  d <- data.frame(child = character(), father = character(), mother = character(), stringsAsFactors = FALSE);
+  d <- addAllChildren(d, pTable$X2.way.M.M, pTable$M.M.F, pTable$M.M.M);
+  d <- addAllChildren(d, pTable$X2.way.M.F, pTable$M.F.F, pTable$M.F.M);
+  d <- addAllChildren(d, pTable$X2.way.F.M, pTable$F.M.F, pTable$F.M.M);
+  d <- addAllChildren(d, pTable$X2.way.F.F, pTable$F.F.F, pTable$F.F.M);
+  d <- addAllChildren(d, pTable$X4.way.M, pTable$X2.way.M.F, pTable$X2.way.M.M);
+  d <- addAllChildren(d, pTable$X4.way.F, pTable$X2.way.F.F, pTable$X2.way.F.M);
+  d <- addAllChildren(d, pTable$X8.way.code, pTable$X4.way.F, pTable$X4.way.M);
+  return(d);
+}
+
+
 # Find RIL's parents
 # cname = the ril name MEL..
 # pedrigreetable = pedigree table ('MAGIC_pedigree.csv')
@@ -27,6 +172,7 @@ processPedrigree = function(cname, pedrigreetable)
     return(cname);
   }
 }
+
 
 readEmpirical <- function(fname, cutoff)
 {
@@ -332,6 +478,7 @@ reducePixcols <- function(d, pixcolList)
   b <- !isPixColumnHeader(h) | (h %in% pixcolList);
   return(d[, b]);
 }
+
 
 doodleTimeToJulian <- function(s, startDay = 0)
 {
