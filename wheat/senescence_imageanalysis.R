@@ -3,6 +3,23 @@ library("ggplot2");
 ## can't we get rid of this? and of ggplot2 as well, preferably?
 library("gdata");
 
+# Load metadata file
+getMetadata = function()
+{
+  metadata = read.table('wheat/w8_metadata.csv', sep = ',', header=T);
+  return(metadata);
+  
+}
+
+# Pheno_id is the id given for phenotyping purposes. It's the id in the doodle file
+getMAGICId = function(metadata, pheno_id)
+{
+  i = which(metadata[['barcode']] == pheno_id)
+  return(as.character(metadata[i, 'genotype']));
+  
+  
+}
+
 
 ## compute a data frame of nodes in column n, and their distance to
 ## the query node n in column distance. 
