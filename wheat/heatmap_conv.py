@@ -7,11 +7,8 @@ Created on Thu Oct 17 11:34:31 2019
 
 import cv2   
 from matplotlib import pyplot as plt
-import os
-import sys
-import glob
-from PIL import Image
 import numpy as np
+import csv
 
 
 
@@ -65,7 +62,7 @@ def extract_data_image(im, h, w):
     return(heatmap_array)
 
 
-def write_expressiondata(heatmap_array, t_min, t_max, family):
+def write_expressiondata(heatmap_array, tmin, tmax, family, geneid):
     """ export expression data to file
      Keyword arguments:
     heatmap_array - data extracted from histogram
@@ -78,13 +75,20 @@ def write_expressiondata(heatmap_array, t_min, t_max, family):
     minin = np.amin(heatmap_array)
     maxim = np.amax(heatmap_array)
     f = ''
+    
     for x in range(0, heatmap_array.shape[0]): 
-        f = f + "%s,%s," % (geneid[(x+1)][:-1], family)
+        o = geneid[(x+1)].split(' ')[0].split(',')
+        
+        f = f + "%s, %s,%s," % (o[1][1:], o[0], family)
+       
         for y in range(0, heatmap_array.shape[1]): 
-            heatmap_array[x,y]  = scale_number(heatmap_array[x, y], t_min, \
-                         t_max, maxim, minin)
+            heatmap_array[x,y]  = scale_number(heatmap_array[x, y], tmin, \
+                         tmax, maxim, minin)
             f = f + "%5.2f, " % heatmap_array[x,y]
+            
+            
         f = f + "\n"
+       
     return(f)
 
 
@@ -94,28 +98,34 @@ h = (91, 18, 38) # y bins
 t_max = (8.73, 4.62, 5.22) # Max value in heatmap
 t_min = 0 # Min value in heatmap
 family_name = ('chl', 'wrky', 'myb')
-f1 = open('data/sag_gene_data.csv', 'w')
-gene_data = ''
+
+f = open('data/sag_gene_data.csv', 'w')
+
+g = ''
 stages = ('GS0','GS10', 'GS20', 'GS30',	'GS40',	'GS50',	'GS60',	'GS70',	\
               'GS80','GS90')
-gene_data = "%s,%s,"% ('geneid', 'name')
+f.write("%s, %s,%s,"% ('annotation', 'geneid', 'name'))
 
 for i in range(0, len(stages)):
-    gene_data = gene_data + "%s," %stages[i]
-gene_data = gene_data + "\n"
-    
-for i in range(0, len(family_name)):
+    g = g + "%s," %stages[i]
+g = g + "\n"
+   
+
+for i in range(0, len(family_name)): #
     fname = 'data/' + '%s'%family_name[i] + '_genes.png'
     im = cv2.imread(fname,1) # Read image
     fname = 'data/' + '%s'%family_name[i] + '_geneid.csv'
     filename = open(fname, "r") # Read geneid
-    geneid = filename.readlines() # Read geneid
+    geneid = filename.readlines() 
+    filename.close()# Read geneid
     im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)# Change to gray
     heatmap_array = extract_data_image(im, h[i], w)
     fname = 'data/' + '%s'%family_name[i] + '_gene_data.csv'
-    gene_data = gene_data + write_expressiondata(heatmap_array, t_min, t_max[i], family_name[i]) 
+    ff = write_expressiondata(heatmap_array, t_min, t_max[i], family_name[i], geneid) 
+    g = g + ff
     plt.imshow(heatmap_array, cmap='hot', interpolation='nearest')
     plt.show()
 
-f1.write(gene_data)
-f1.close()
+
+f.write(g)
+f.close()
