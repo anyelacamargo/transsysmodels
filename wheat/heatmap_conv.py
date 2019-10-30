@@ -2,13 +2,12 @@
 """
 Created on Thu Oct 17 11:34:31 2019
 
-@author: X992029
+@author: Anyela
 """
 
 import cv2   
 from matplotlib import pyplot as plt
 import numpy as np
-import csv
 
 
 
