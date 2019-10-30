@@ -311,16 +311,12 @@ plot_gene_graph <- function(cl, path){
   
 #' Process raw data
 #' @param sdata datase
-process_rawdata <- function(sdata){
+#' @param b aggregate by
+process_rawdata <- function(sdata, b){
   
-  p <- data.frame('NAM', t(sapply(2:11, function(x)
-    mean(sdata[grep('NAM', unique(sdata[['name']])), x]))))
-  names(p) <- names(sdata)
-  sdata <- rbind(sdata, p)
-  sdata <- sdata[-grep('NAM_', sdata[['name']]),]
-  sdata[['name']] <- drop.levels(sdata[['name']])
-  sdata[['name']] <- factor(sdata[['name']], 
-                               levels = unique(sdata[['name']]))
+  
+  f <- as.formula(paste('. ~', b, sep = ''))
+  sdata <- aggregate(f, data = sdata, FUN= "mean")
   
   return(sdata)
   
@@ -375,6 +371,7 @@ plot_anthesis <- function(sdata){
 
 }
 
+
 doodle <- read.table('doodle.csv', header=T, sep=',')
 freqs <- colnames(doodle)[3:dim(doodle)[2]]
 freqs <- as.numeric(sub("X", "", freqs))
@@ -408,11 +405,10 @@ all_data <- average_color_data(groundtruth, doodle)
 write.table(all_data, file='all_calib_data.csv', sep=',', quote = F, 
             row.names=F)
 
-gene_group <- c('Chlorophyll','vrn-B3','WRKY49','MYBS3', 'NAM')
+gene_group <- c('Chlorophyll','vrn-B3','WRKY','MYB', 'NAM')
 # Plot gene expression data
 emp_data <- read.csv('data/empiricaldata_v1.csv', header=TRUE, skip = 1)
-emp_data <- process_rawdata(emp_data[c(grep('NAM', emp_data$name),
-                                       match(gene_group[1:4], emp_data$name)), ]) 
+emp_data <- process_rawdata(emp_data[, 3:13], 'name') 
 
 
 

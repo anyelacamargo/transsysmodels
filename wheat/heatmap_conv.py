@@ -96,7 +96,7 @@ w = (10) # x bins
 h = (91, 18, 38) # y bins
 t_max = (8.73, 4.62, 5.22) # Max value in heatmap
 t_min = 0 # Min value in heatmap
-family_name = ('chl', 'wrky', 'myb')
+family_name = ('Chlorophyll', 'wrky', 'myb')
 
 f = open('data/sag_gene_data.csv', 'w')
 
