@@ -7,6 +7,10 @@ require(gridExtra)
 #Calibrate pixels
 
 
+
+
+
+
 plot_graph <- function(exp_mat){
   
   g <- graph_from_adjacency_matrix(as.matrix(exp_mat[1:nrow(exp_mat), 
@@ -264,32 +268,42 @@ plot_average_colour <- function(avgdata, groundtruth, titlen){
 }
 
 
-plot_gene_graph <- function(cl, path, kw, vs = 8, lab = TRUE, dev_list){
+
+plot_gene_graph <- function(cl, gene_net, vs = 8, lab = TRUE, dev_list,
+                           label_name){
+  
+  
+  o <- plot_graph(gene_net)
+  
+  #l <- layout_with_fr(o, layers = NULL)
+  l <- layout_with_sugiyama(o, layers = NULL)
+  if(lab == TRUE)
+  {
+    #vs <- 18# * igraph::degree(o)
+    vl <- V(o)$name
+  } 
+  plot(o, vertex.size = vs, #, 
+       edge.color = 'gray', 
+       edge.width = 1, edge.arrow.size=0.3, vertex.color = cl,  
+       vertex.label.color="black",vertex.label.cex=0.9,
+       vertex.label = vl, vertex.frame.color="gray",
+       main = dev_list, layout=l$layout)
+  legend("topleft", label_name, bty='n')
+  
+}
+
+
+plot_gene_graphs <- function(cl, path, kw, vs = 8, lab = TRUE, dev_list){
   
   label_name <- c('A', 'B', 'C', 'D', 'E', 'F', 'G')
   vl <- NA  
  
   for(i in 4:10){
     
-    senes_net <- read.csv(paste(path, kw, i, '.csv', sep=''), 
+    gene_net <- read.csv(paste(path, kw, i, '.csv', sep=''), 
                           header = TRUE)
-    o <- plot_graph(senes_net)
-    l <- layout_with_sugiyama(o, layers = NULL)
-    if(lab == TRUE)
-    {
-      #vs <- 18# * igraph::degree(o)
-      vl <- V(o)$name
-    } 
-    plot(o, vertex.size = vs, #, 
-         edge.color = 'gray', 
-         edge.width = 1, edge.arrow.size=0.3, vertex.color = cl,  
-         vertex.label.color="black",vertex.label.cex=0.9,
-         vertex.label = vl, vertex.frame.color="gray",
-         main = dev_list[i], layout=l$layout)
-    legend("topleft", label_name[i-3], bty='n')
-    
-   # return(p)
-    
+    plot_gene_grap(cl, gene_net, vs = 8, lab = TRUE, dev_list[i], 
+                   label_name[i-3])
    
   }
 }
@@ -397,7 +411,7 @@ plot_gene_expression_data <- function(sdata, gene_group, color_code){
 }
 
 
-
+break
 doodle <- read.table('doodle.csv', header=T, sep=',')
 freqs <- colnames(doodle)[3:dim(doodle)[2]]
 freqs <- as.numeric(sub("X", "", freqs))
@@ -478,19 +492,25 @@ y <- table(emp_data$name[-162])
 cl_all <- unlist(sapply(1:7, function(x) rep(color_code[x], y[[gene_group[x]]])))
 tiff('senes_net_full.tiff', width=900, height = 800, res = 150)
 par(mfrow = c(3,3), mar=c(0, 1.5, 1, 0))
-plot_gene_graph(cl_all, 'c:/Users/x992029/share/','senes_t_', 12, FALSE,
+plot_gene_graphs(cl_all, 'c:/Users/x992029/share/','senes_t_', 12, FALSE,
                 c("GS0","GS10", "GS20","GS30", "GS40","GS50","GS60", "GS70",
                   "GS80","GS90" ))
 dev.off()
 
-break
+
 
 d <- read.csv('c:/Users/x992029/share/senesmall_t_4.csv', header=TRUE)
 l <- as.character(d$X)
 cl <- unlist(lapply(l, function(x) color_code[match(x, gene_group)]))
 tiff('senes_net_mean.tiff', width=900, height = 800, res = 200)
 par(mfrow = c(3,3), mar=c(0, 1.5, 1, 0))
-plot_gene_graph(cl, 'c:/Users/x992029/share/', 'senesmall_t_', 40, TRUE, 
+plot_gene_graphs(cl, 'c:/Users/x992029/share/', 'senesmall_t_', 40, TRUE, 
                 c("GS0","GS10", "GS20","GS30", "GS40","GS50","GS60", "GS70",
                   "GS80","GS90" ))
 dev.off()
+
+g <- read.csv('data/hypothetical_net.csv', header=TRUE)
+tiff('senes_h.tiff', width=900, height = 800, res = 200)
+plot_gene_graph('tomato', g, vs = 48, lab = TRUE, '', '')
+dev.off()
+
