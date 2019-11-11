@@ -90,20 +90,20 @@ takeMeans <- function(x)
 }
 
 # Plot the thing
-print_plot <-  function(sdata, br, lb, o){
+print_plot <-  function(sdata, br, lb, o, titlen){
  
-  
+  sdata$value <- sdata$value/10000
   p <- ggplot(sdata,aes(x = DAS, y = value, fill=intensity, group=intensity)) +
     geom_area() + geom_line(aes(y=value), position="stack") +
     scale_fill_manual(values = as.character(unique(sdata$intensity))) + 
-    ylab(label = "Colour frequency") + xlab(label = "Developmental stage") +
+    ylab(label = "Colour frequency (units = 10K)") + xlab(label = "Developmental stage") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 12),
-          axis.text.y = element_text(size = 12),
+          axis.text.y = element_text(size = 10),
           axis.title.x = element_text(size = 12),
-          axis.title.y = element_text(size = 12),
+          axis.title.y = element_text(10),
           panel.background = element_rect(fill = "white", colour = "grey50"),
           legend.position="none") +
-    labs(title = 'B', face ='bold') +
+    labs(title = titlen, face ='bold') +
     #scale_x_continuous(breaks=seq(min(sdata$DAS), max(sdata$DAS), by=5), 
     #                   labels = seq(min(sdata$DAS), max(sdata$DAS), by=5)) +
     scale_x_continuous(breaks = br, labels = lb) +
@@ -115,7 +115,7 @@ print_plot <-  function(sdata, br, lb, o){
                linetype="dotted", 
                color = c("red", "green", "blue"), size=1.5)
     
-  print(p)
+  return(p)
 }
 
 # subset of data
@@ -177,7 +177,7 @@ get_DAS <- function(sdata, DAS, date_list){
 
 
 #' Plot colour image
-plot_color_image <- function(idtagname_list, doodle, groundtruth, it){
+plot_color_image <- function(idtagname_list, doodle, groundtruth, it, titlen){
   
   
   for(idtagname in idtagname_list){
@@ -202,15 +202,17 @@ plot_color_image <- function(idtagname_list, doodle, groundtruth, it){
         lb <- rep('', length(br))
         lb[as.numeric(lapply(1:4, function(x) which(br == o[[x]])))] = colnames(o)
         
-        tiff(paste(idtagname, '.tiff', sep = ''), height = 1000, width = 1000,
-             res = 200)
-        print_plot(cdatacal, br, lb, o)
-        dev.off()
+        #tiff(paste(idtagname, '.tiff', sep = ''), height = 1000, width = 1000,
+         #    res = 200)
+        p <- print_plot(cdatacal, br, lb, o, 'C')
+        
+        #dev.off()
       }
     }
     
     #if(readline(idtagname) == 'q') { break }
   }
+  return(p)
 }
 
 #' Get average color data
@@ -233,40 +235,15 @@ average_color_data <- function(groundtruth, doodle){
 }
 
 
-plot_gene_expression_data <- function(emp_data, gene_group, color_code){
-  
-  DT.m1 <- melt(emp_data, id.vars = 'name',
-                measure.vars = names(emp_data)[-1], variable.name = 'stage',
-                value.name = 'expression_level')
-  
-  
-  DT.m1 <- data.frame(DT.m1, group = gene_group)
-  
- 
-  p <- ggplot(DT.m1, aes(x = stage, y = expression_level,  group = name, 
-                         colour= name)) +
-    geom_point(size =3, aes(shape = name)) + geom_line(size=1.2) +
-    theme(panel.background = element_rect(fill = "white", colour = "grey50"),
-          axis.text.x = element_text(angle = 90, hjust = 1, size = 12),
-          axis.title.y = element_text(size = 12), 
-          legend.text = element_text(size=10),
-          legend.position = 'none') +
-    #legend.position=c(0.08, 0.78)) +
-    xlab(label = "Developmental stage") + ylab(label = 'Expression level (log2)') +
-    labs(title = 'A', face ='bold') + ylim(0,8) +
-    scale_color_manual(values=color_code)
-                        
-  return(p)
- 
-}
 
-plot_average_colour <- function(avgdata, groundtruth){
+plot_average_colour <- function(avgdata, groundtruth, titlen){
   
   
   colnames(avgdata)[which(colnames(avgdata) == 'Group.1') ] <- 'DAS'
   avgdata <- cbind(idtag = 'avgdata', avgdata)
   cdatacal <- get_subdata(avgdata, it, intens)
   cdatacal$DAS <- as.numeric(as.character(cdatacal$DAS))
+  
   o <- list()
   #, 'FlagLeafSenescence_DAS')]
   o[['gs39_DAS']] <- round(mean(groundtruth$gs39_DAS, na.rm = TRUE))
@@ -281,32 +258,40 @@ plot_average_colour <- function(avgdata, groundtruth){
   lb[as.numeric(lapply(1:length(o), function(x) which(br == o[[x]])))] = names(o)
  
   
-  print_plot(cdatacal, br, lb, o)
+  p <- print_plot(cdatacal, br, lb, o, titlen)
+  return(p)
   
 }
 
 
-plot_gene_graph <- function(cl, path){
+plot_gene_graph <- function(cl, path, kw, vs = 8, lab = TRUE, dev_list){
   
   label_name <- c('A', 'B', 'C', 'D', 'E', 'F', 'G')
-  
+  vl <- NA  
  
   for(i in 4:10){
     
-    senes_net <- read.csv(paste(path, 'senes_t_', i, '.csv', sep=''), 
+    senes_net <- read.csv(paste(path, kw, i, '.csv', sep=''), 
                           header = TRUE)
     o <- plot_graph(senes_net)
     l <- layout_with_sugiyama(o, layers = NULL)
-   
-    plot(o, vertex.size= 5*igraph::degree(o), edge.color = 'black', 
+    if(lab == TRUE)
+    {
+      #vs <- 18# * igraph::degree(o)
+      vl <- V(o)$name
+    } 
+    plot(o, vertex.size = vs, #, 
+         edge.color = 'gray', 
          edge.width = 1, edge.arrow.size=0.3, vertex.color = cl,  
          vertex.label.color="black",vertex.label.cex=0.9,
-         vertex.label = V(o)$name,
-         main = colnames(emp_data)[i+1], layout=l$layout)
-    legend("topright", label_name[i-3], bty='n')
+         vertex.label = vl, vertex.frame.color="gray",
+         main = dev_list[i], layout=l$layout)
+    legend("topleft", label_name[i-3], bty='n')
+    
+   # return(p)
+    
    
   }
-  #dev.off()  
 }
   
 #' Process raw data
@@ -344,9 +329,7 @@ process_rawdata_age <- function(sdata){
                             levels = unique(sdata[['name']]))
   
 
-  sdata <- melt(sdata, id.vars = c("log2","gene","name"),
-                measure.vars = names(sdata)[-1:-3], variable.name = 'stage',
-                value.name = 'expression_level')
+ 
   return(sdata)
   
 }
@@ -354,14 +337,26 @@ process_rawdata_age <- function(sdata){
 #' Plost anthesis data
 #' @param sdata dataset
 #'
-plot_anthesis <- function(sdata){
+plot_anthesis <- function(sdata, color_code){
   
-  p <- ggplot(sdata,aes(x = stage, y = expression_level, color = name)) +
+ 
+  DT.m1 <- melt(sdata, id.vars = c("name"),
+                measure.vars = names(sdata)[-1], variable.name = 'stage',
+                value.name = 'expression_level')
+  
+  DT.m1[['stage']] <- as.numeric(gsub('X', '', DT.m1[['stage']]))
+  DT.m1[['expression_level']] <- as.numeric(DT.m1[['expression_level']])
+  
+  
+  p <- ggplot(DT.m1,aes(x = stage, y = expression_level, color = name)) +
     geom_point(size =3, aes(shape = name)) + geom_line(size=1.2) +
     theme(panel.background = element_rect(fill = "white", colour = "grey50"),
           axis.text.x = element_text(angle = 0, hjust = 1, size = 12),
-          axis.title.y = element_text(size = 12), 
-          legend.text = element_text(size=10)) +
+          axis.title.y = element_text(size = 10), 
+          legend.text = element_text(size=10),
+          legend.margin=margin(0,0,0,0),
+          legend.box.margin=margin(-10,-10,-10,-10)) +
+          #legend.position = 'none') +
     xlab(label = "Days after anthesis") + ylab(label = 'Expression level (log2)') +
     #labs(title = 'A', face ='bold') + ylim(0,8) +
     scale_color_manual(values=color_code) +
@@ -370,6 +365,37 @@ plot_anthesis <- function(sdata){
   return(p)
 
 }
+
+
+plot_gene_expression_data <- function(sdata, gene_group, color_code){
+  
+  
+  DT.m1 <- melt(sdata, id.vars = 'name',
+                measure.vars = names(sdata)[-1], variable.name = 'stage',
+                value.name = 'expression_level')
+  
+  DT.m1 <- data.frame(DT.m1, group = DT.m1$name)
+  
+  
+  p <- ggplot(DT.m1, aes(x = stage, y = expression_level,  group = name, 
+                         colour= name)) +
+    geom_point(size =3, aes(shape = name)) + geom_line(size=1.2) +
+    theme(panel.background = element_rect(fill = "white", colour = "grey50"),
+          axis.text.x = element_text(angle = 90, hjust = 1, size = 12),
+          axis.title.y = element_text(size = 10), 
+          legend.text = element_text(size=10),
+          legend.position = 'none') +
+    #legend.position=c(0.08, 0.78)) +
+    xlab(label = "Developmental stage") + ylab(label = 'Expression level (log2)') +
+    labs(title = 'A', face ='bold') + ylim(0,8) +
+    scale_color_manual(values=color_code)
+  #+
+  # 
+  
+  return(p)
+  
+}
+
 
 
 doodle <- read.table('doodle.csv', header=T, sep=',')
@@ -405,43 +431,66 @@ all_data <- average_color_data(groundtruth, doodle)
 write.table(all_data, file='all_calib_data.csv', sep=',', quote = F, 
             row.names=F)
 
-gene_group <- c('Chlorophyll','vrn-B3','WRKY','MYB', 'NAM')
+gene_group <- c('NAM', 'vrn-B3','.pos', '.neg', 'Chlorophyll','WRKY','MYB')
 # Plot gene expression data
+color_code <- c("#56B4E9", "#E69F00", '#33FF33', "#FF0000", 
+      "#D55E00", "#0000FF","#FF00FF") 
+
 emp_data <- read.csv('data/empiricaldata_v1.csv', header=TRUE, skip = 1)
-emp_data <- process_rawdata(emp_data[, 3:13], 'name') 
+emp_data_p <- process_rawdata(emp_data[, 3:13], 'name') 
+#emp_data_ps <- subset(emp_data_p, !grepl('\\.', name))
+#emp_data_ps[['name']] <- drop.levels(emp_data_ps[['name']])
+emp_data_ps <- emp_data_p
+emp_data_ps[['name']] <- factor(emp_data_p[['name']], levels = gene_group)
 
-
-
-color_code <- c("#999999", "#E69F00", "#56B4E9", "#009E73", 
-      "#D55E00") #, "#b20019","#F0E442", 
-
-
-
-break
-tiff('senes_net.tiff', width=900, height = 800, res = 150)
-par(mfrow = c(3,3), mar=c(0, 1.5, 1, 0))
-plot_gene_graph(color_code, 'c:/Users/x992029/share/')
-dev.off()
 # Plot
 avgdata <- subset(aggregate(all_data, by=list(all_data[['Group.1']]), 
                             FUN=mean), select = -c(idtag, Group.1))
-tiff(paste('average', '.tiff', sep = ''), height = 1000, width = 1000,
-     res = 200)
-plot_average_colour(avgdata, groundtruth)
-dev.off()
-## Plot gene 
 
+p0 <- plot_average_colour(avgdata, groundtruth, 'C')
+#dev.off()
 
-p1 <- plot_gene_expression_data(emp_data, gene_group, color_code)
-
+## Plot developmental gene expression 
+p1 <- plot_gene_expression_data(emp_data_ps, gene_group, 
+                                color_code)
+p1
+# Read anthesis data
 anthesis_data <- read.csv('data/empiricaldata_postanthesis.csv', header = TRUE)
-anthesis_data <- process_rawdata_age(anthesis_data)
-anthesis_data$stage <- as.numeric(gsub('X', '', anthesis_data$stage))
+anthesis_data <- subset(anthesis_data, log2 == 'tpm')
+anthesis_data <- process_rawdata(anthesis_data[,3:12], 'name')
+d <- data.frame(cbind(name = c('.pos', '.neg'), rbind(rep(NA,9), 
+                                                      rep(rep(NA, 9)))))
+colnames(d)[2:ncol(d)] <- colnames(anthesis_data)[2:ncol(d)]
+anthesis_data <- rbind(anthesis_data, d)
+anthesis_data[['name']] <- factor(anthesis_data[['name']], 
+                                  levels = gene_group)
 
-p2 <- plot_anthesis(subset(anthesis_data, log2 == 'tpm'))
 
+p2 <- plot_anthesis(anthesis_data,  color_code)
+p2
 
-tiff('expression_prof.tiff', height = 800, width = 1500, res = 180)
-grid.arrange(p1, p2, ncol=2)
+tiff('expression_prof_colors.tiff', height = 800, width = 1500, res = 180)
+grid.arrange(p1, p2, p0, ncol=2, nrow=2)
 dev.off()
 
+
+y <- table(emp_data$name[-162])
+cl_all <- unlist(sapply(1:7, function(x) rep(color_code[x], y[[gene_group[x]]])))
+tiff('senes_net_full.tiff', width=900, height = 800, res = 150)
+par(mfrow = c(3,3), mar=c(0, 1.5, 1, 0))
+plot_gene_graph(cl_all, 'c:/Users/x992029/share/','senes_t_', 12, FALSE,
+                c("GS0","GS10", "GS20","GS30", "GS40","GS50","GS60", "GS70",
+                  "GS80","GS90" ))
+dev.off()
+
+break
+
+d <- read.csv('c:/Users/x992029/share/senesmall_t_4.csv', header=TRUE)
+l <- as.character(d$X)
+cl <- unlist(lapply(l, function(x) color_code[match(x, gene_group)]))
+tiff('senes_net_mean.tiff', width=900, height = 800, res = 200)
+par(mfrow = c(3,3), mar=c(0, 1.5, 1, 0))
+plot_gene_graph(cl, 'c:/Users/x992029/share/', 'senesmall_t_', 40, TRUE, 
+                c("GS0","GS10", "GS20","GS30", "GS40","GS50","GS60", "GS70",
+                  "GS80","GS90" ))
+dev.off()
