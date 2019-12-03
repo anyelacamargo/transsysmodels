@@ -4,11 +4,8 @@ library(dplyr)
 library(igraph)
 library(reshape2)
 require(gridExtra)
+library(sgnesR)
 #Calibrate pixels
-
-
-
-
 
 
 plot_graph <- function(exp_mat){
@@ -52,16 +49,17 @@ convert2hex <- function(data1, data2)
 get_subdata = function(sdata, conver_table, intens)
 {
 
-  
+  print(intens)
   #' I us want to use the same intensities # Vey crude way but it 
   #' seems they're the most relevants.
   
   u = colnames(sdata) %in% intens # Search for intens
   scc1= data.frame(idtag = sdata$idtag, 
                    DAS = sdata$DAS, sdata[,u]) # Create frame with sel intensi 
-  freq = colnames(scc1)[3:dim(scc1)[2]]
-  freq = as.numeric(sub("X", "", freq))
-  colnames(scc1)[3:dim(scc1)[2]] = freq # Delete X in columns
+  #freq = colnames(scc1)[3:dim(scc1)[2]]
+  #freq = as.numeric(sub("X", "", freq))
+  freq = intens
+  colnames(scc1)[3:dim(scc1)[2]] = intens # Delete X in columns
   #write.table(scc1, file='t.csv', sep=',', row.names=F)
   
   mm = as.matrix(scc1[, 3:dim(scc1)[2]]) # Deletes -4
@@ -70,11 +68,11 @@ get_subdata = function(sdata, conver_table, intens)
   idtag = as.character(unique(scc1$idtag)) # Unique idtags
   DAS = as.character(unique(scc1$DAS)) # unique time points
   hexlist = convert2hex(freq, conver_table) #
-  hexlist[c(1:11)] <- c("#C08040","#C08041","#C08042","#C08043","#C08044",
-                        "#C08045","#C08046","#C08047","#C08048","#C08049",
-                        "#C08040")
-  hexlist[c(12:18, 20)] <- c("#004001", "#004002","#004003", "#004004",
-                             "#004005","#004006", "#004007", "#004008")
+  #hexlist[c(1:11)] <- c("#C08040","#C08041","#C08042","#C08043","#C08044",
+   #                     "#C08045","#C08046","#C08047","#C08048","#C08049",
+    #                    "#C08040")
+  #hexlist[c(12:18, 20)] <- c("#004001", "#004002","#004003", "#004004",
+  #                           "#004005","#004006", "#004007", "#004008")
   conveg = expand.grid(idtag=idtag, intensity=hexlist,DAS=DAS)
   cdata = data.frame(conveg, value=vector_data)
   
@@ -96,7 +94,11 @@ takeMeans <- function(x)
 # Plot the thing
 print_plot <-  function(sdata, br, lb, o, titlen){
  
-  sdata$value <- sdata$value/10000
+  #sdata <- cdatacal
+  #sdata$value <- sdata$value/10000
+  #sdata$value <- log(sdata$value)
+  sdata$value <- scales::rescale(sdata$value, to=c(0,10))
+ 
   p <- ggplot(sdata,aes(x = DAS, y = value, fill=intensity, group=intensity)) +
     geom_area() + geom_line(aes(y=value), position="stack") +
     scale_fill_manual(values = as.character(unique(sdata$intensity))) + 
@@ -113,13 +115,15 @@ print_plot <-  function(sdata, br, lb, o, titlen){
     scale_x_continuous(breaks = br, labels = lb) +
     #ggtitle(unique(sdata$idtag)) + 
     geom_vline(xintercept = c(as.numeric(as.character(o[[1]])), 
-                              as.numeric(as.character(o[[2]])),
+                             as.numeric(as.character(o[[2]])),
                               as.numeric(as.character(o[[3]]))),
                #               as.numeric(as.character(o[[4]]))), 
                linetype="dotted", 
                color = c("red", "green", "blue"), size=1.5)
     
   return(p)
+  
+  
 }
 
 # subset of data
@@ -209,14 +213,16 @@ plot_color_image <- function(idtagname_list, doodle, groundtruth, it, titlen){
         #tiff(paste(idtagname, '.tiff', sep = ''), height = 1000, width = 1000,
          #    res = 200)
         p <- print_plot(cdatacal, br, lb, o, 'C')
+        print(p)
         
         #dev.off()
       }
     }
     
-    #if(readline(idtagname) == 'q') { break }
+    if(readline(idtagname) == 'q') { break }
   }
-  return(p)
+  #return(p)
+  
 }
 
 #' Get average color data
@@ -240,7 +246,7 @@ average_color_data <- function(groundtruth, doodle){
 
 
 
-plot_average_colour <- function(avgdata, groundtruth, titlen){
+plot_average_colour <- function(avgdata, groundtruth, titlen, intens){
   
   
   colnames(avgdata)[which(colnames(avgdata) == 'Group.1') ] <- 'DAS'
@@ -270,13 +276,19 @@ plot_average_colour <- function(avgdata, groundtruth, titlen){
 
 
 plot_gene_graph <- function(cl, gene_net, vs = 8, lab = TRUE, dev_list,
-                           label_name){
+                           label_name, versize = 0.9, arrowsize = 0.3, lo=TRUE){
   
   
   o <- plot_graph(gene_net)
   
   #l <- layout_with_fr(o, layers = NULL)
-  l <- layout_with_sugiyama(o, layers = NULL)
+  if(lo == TRUE){
+    
+    l <- layout_randomly(o, dim = 2)
+  } else {
+    l <- layout_with_sugiyama(o, layers = NULL)
+    l <- l$layout
+  }
   if(lab == TRUE)
   {
     #vs <- 18# * igraph::degree(o)
@@ -284,10 +296,10 @@ plot_gene_graph <- function(cl, gene_net, vs = 8, lab = TRUE, dev_list,
   } 
   plot(o, vertex.size = vs, #, 
        edge.color = 'gray', 
-       edge.width = 1, edge.arrow.size=0.3, vertex.color = cl,  
-       vertex.label.color="black",vertex.label.cex=0.9,
+       edge.width = 1, edge.arrow.size=arrowsize, vertex.color = cl,  
+       vertex.label.color="black",vertex.label.cex=versize,
        vertex.label = vl, vertex.frame.color="gray",
-       main = dev_list, layout=l$layout)
+       main = dev_list, layout=l)
   legend("topleft", label_name, bty='n')
   
 }
@@ -302,7 +314,7 @@ plot_gene_graphs <- function(cl, path, kw, vs = 8, lab = TRUE, dev_list){
     
     gene_net <- read.csv(paste(path, kw, i, '.csv', sep=''), 
                           header = TRUE)
-    plot_gene_grap(cl, gene_net, vs = 8, lab = TRUE, dev_list[i], 
+    plot_gene_graph(cl, gene_net, vs = 38, lab = TRUE, dev_list[i], 
                    label_name[i-3])
    
   }
@@ -411,7 +423,7 @@ plot_gene_expression_data <- function(sdata, gene_group, color_code){
 }
 
 
-break
+
 doodle <- read.table('doodle.csv', header=T, sep=',')
 freqs <- colnames(doodle)[3:dim(doodle)[2]]
 freqs <- as.numeric(sub("X", "", freqs))
@@ -425,14 +437,19 @@ date_list <- d <- seq.Date(as.Date(start_day, format = '%Y-%m-%d'),
                            as.Date(end_day, format = '%Y-%m-%d'), by='day') 
 
 DAS <- sapply(d, function(x) x-d[1])
+
 doodle <- get_DAS(doodle,  DAS, date_list)
 doodle <- calibratedata(doodle, DAS, date_list)
 
 # Read table with frequencies
 it <- read.table('contable.csv', header=T, sep=',')
-it <- data.frame(it, hex=rgb(it[,2:4], max=255))
+it[, 2:4] <- it[, 2:4]/255
+it <- data.frame(it, hex=rgb(it[,2:4], max=1))
 # Select intensities
-intens = c(1,4,5,16,20,21,24,25,26,27,30,31,32,50,54,55,60,108,112,116)
+#intens = c(1,4,5,16,20,21,24,25,26,27,30,31,32,109,112)
+intens = c(4,5,9,10,26,31,32,55,61,112)
+#intens = setdiff(0:127, which(apply(doodle[, 3:ncol(doodle)], 2, mean) == 0))
+#intens1 = intens
 # Select subdataset
 
 idx = which(groundtruth$unknown != '')
@@ -442,8 +459,8 @@ idtagname_list = unique(groundtruth$barcode[idx])
 # Plot colour plots
 #plot_color_image(idtagname_list, doodle, groundtruth, it)
 all_data <- average_color_data(groundtruth, doodle)
-write.table(all_data, file='all_calib_data.csv', sep=',', quote = F, 
-            row.names=F)
+#write.table(all_data, file='all_calib_data.csv', sep=',', quote = F, 
+ #           row.names=F)
 
 gene_group <- c('NAM', 'vrn-B3','.pos', '.neg', 'Chlorophyll','WRKY','MYB')
 # Plot gene expression data
@@ -460,8 +477,9 @@ emp_data_ps[['name']] <- factor(emp_data_p[['name']], levels = gene_group)
 # Plot
 avgdata <- subset(aggregate(all_data, by=list(all_data[['Group.1']]), 
                             FUN=mean), select = -c(idtag, Group.1))
+p0 <- plot_average_colour(avgdata, groundtruth, 'C', intens)
+print(p0)
 
-p0 <- plot_average_colour(avgdata, groundtruth, 'C')
 #dev.off()
 
 ## Plot developmental gene expression 
@@ -487,7 +505,7 @@ tiff('expression_prof_colors.tiff', height = 800, width = 1500, res = 180)
 grid.arrange(p1, p2, p0, ncol=2, nrow=2)
 dev.off()
 
-
+break
 y <- table(emp_data$name[-162])
 cl_all <- unlist(sapply(1:7, function(x) rep(color_code[x], y[[gene_group[x]]])))
 tiff('senes_net_full.tiff', width=900, height = 800, res = 150)
@@ -508,9 +526,12 @@ plot_gene_graphs(cl, 'c:/Users/x992029/share/', 'senesmall_t_', 40, TRUE,
                 c("GS0","GS10", "GS20","GS30", "GS40","GS50","GS60", "GS70",
                   "GS80","GS90" ))
 dev.off()
-
-g <- read.csv('data/hypothetical_net.csv', header=TRUE)
-tiff('senes_h.tiff', width=900, height = 800, res = 200)
-plot_gene_graph('tomato', g, vs = 48, lab = TRUE, '', '')
+g <- read.csv('data/hypothetical_net _simple.csv', header=TRUE)
+cl <- unlist(lapply(as.character(g$X), function(x) 
+  color_code[match(x, gene_group)]))
+tiff('senes_h.tiff', width=1900, height = 2000, res = 200)
+mar=c(0, 0, 0, 0)
+plot_gene_graph(c(cl[-4], 'tomato'), g, vs = 78, lab = TRUE, 
+                '', '',  versize = 2)#, 2)
 dev.off()
 
